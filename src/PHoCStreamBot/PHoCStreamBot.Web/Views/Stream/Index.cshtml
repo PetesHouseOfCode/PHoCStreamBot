@@ -4,14 +4,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-    @*<meta name="viewport" content="width=device-width, initial-scale=1.0" />*@
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="~/css/site.css"/>
     <link rel="stylesheet" href="~/lib/toastr/build/toastr.min.css"/>
+    <style>
+        .toast-info {
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .toast-warning {
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+    </style>
 </head>
 <body>
     <div style="background-color: #ffffff; height: auto; font-size:1.25em; font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif">
         <ul id="messagesList"></ul>
     </div>
 
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/toastr/build/toastr.min.js"></script>
     <script src="~/lib/signalr/dist/browser/signalr.js"></script>
     <script src="~/js/Receiver.js"></script>

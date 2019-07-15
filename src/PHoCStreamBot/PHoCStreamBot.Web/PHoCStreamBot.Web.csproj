@@ -18,6 +18,10 @@
     <ProjectReference Include="..\PHoCStreamBot\PHoCStreamBot.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Hubs\Commands\" />
+  </ItemGroup>
+
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <TypeScriptTarget>ES5</TypeScriptTarget>
     <TypeScriptJSXEmit>React</TypeScriptJSXEmit>

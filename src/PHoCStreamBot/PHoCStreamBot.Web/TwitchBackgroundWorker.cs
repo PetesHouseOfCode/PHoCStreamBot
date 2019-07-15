@@ -30,7 +30,7 @@ namespace PHoCStreamBot.Web
 
         private void Client_OnChatCommandReceived(object sender, TwitchLib.Client.Events.OnChatCommandReceivedArgs e)
         {
-            hub.Clients.All.ExecuteCommand("CMD:" + e.Command.CommandText, e.Command.ArgumentsAsString);
+            hub.Clients.All.ExecuteCommand(e.Command.CommandText, e.Command.ArgumentsAsString);
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
