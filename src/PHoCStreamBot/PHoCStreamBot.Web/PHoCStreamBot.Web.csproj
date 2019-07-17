@@ -22,6 +22,10 @@
     <Folder Include="Hubs\Commands\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\Images\CyclopsPete.jpg" />
+  </ItemGroup>
+
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <TypeScriptTarget>ES5</TypeScriptTarget>
     <TypeScriptJSXEmit>React</TypeScriptJSXEmit>

@@ -17,13 +17,15 @@
     </style>
 </head>
 <body>
-    <div style="background-color: #ffffff; height: auto; font-size:1.25em; font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif">
-        <ul id="messagesList"></ul>
-    </div>
-
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/toastr/build/toastr.min.js"></script>
-    <script src="~/lib/signalr/dist/browser/signalr.js"></script>
-    <script src="~/js/Receiver.js"></script>
+<button id="starter" onclick="$('#starter').hide()">Click ME</button>
+<div style="background-color: #ffffff; height: auto; font-size: 1.25em; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif">
+    <ul id="messagesList"></ul>
+</div>
+<img id="hiPete" style="text-align: center; height: 100px; display: none; border-radius: 50%" src="Images/CyclopsPete.jpg"/>
+<div id="bigBanner" style="margin-left: auto; margin-right: auto; display: none; font-family: 'Impact'; font-size: 40px; color: red;"></div>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/toastr/build/toastr.min.js"></script>
+<script src="~/lib/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/Receiver.js"></script>
 </body>
 </html>
