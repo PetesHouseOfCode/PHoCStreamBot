@@ -13,19 +13,27 @@ namespace PHoCStreamBot.Web
     {
         readonly TwitchBot bot;
         readonly IHubContext<PHoCStreamBotHub, IPHoCStreamBotHub> hub;
-
+        readonly List<string> excludedUsers = new List<string>() { "streamlabs" }
+;
         public TwitchBackgroundWorker(
             TwitchBot bot,
             IHubContext<PHoCStreamBotHub, IPHoCStreamBotHub> hub)
         {
             this.hub = hub;
             this.bot = bot;
+            excludedUsers.Add(bot.UserName);
         }
 
         public void HookEvents()
         {
             bot.Client.OnMessageReceived += Client_OnMessageReceived;
             bot.Client.OnChatCommandReceived += Client_OnChatCommandReceived;
+            bot.Client.OnDisconnected += Client_OnDisconnected;
+        }
+
+        private void Client_OnDisconnected(object sender, TwitchLib.Communication.Events.OnDisconnectedEventArgs e)
+        {
+            Console.WriteLine("******** BOT DISCONNECTED!!! **********");
         }
 
         private void Client_OnChatCommandReceived(object sender, TwitchLib.Client.Events.OnChatCommandReceivedArgs e)
@@ -35,8 +43,8 @@ namespace PHoCStreamBot.Web
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            HookEvents();
             bot.Initialize();
+            HookEvents();
             return Task.CompletedTask;
         }
 

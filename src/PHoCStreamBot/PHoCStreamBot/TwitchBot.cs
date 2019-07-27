@@ -20,6 +20,7 @@ namespace PHoCStreamBot
         }
         
         public TwitchClient Client { get; private set; }
+        public string UserName => settings.UserName;
 
         public void Initialize()
         {
@@ -29,7 +30,6 @@ namespace PHoCStreamBot
             Client.OnLog += Client_OnLog;
             Client.OnJoinedChannel += Client_OnJoinedChannel;
             Client.OnConnected += Client_OnConnected;
-
             Client.Connect();
         }
 

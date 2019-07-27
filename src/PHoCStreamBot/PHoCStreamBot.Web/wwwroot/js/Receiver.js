@@ -19,6 +19,10 @@ connection.on("ExecuteCommand", function (command, args) {
         return;
     }
 
+    if (command === "welcome") {
+        toastr.success("Welcome " + args + "!");
+    }
+
     //toastr.warning(
     //    command.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
     //    + " " + args,
@@ -26,9 +30,12 @@ connection.on("ExecuteCommand", function (command, args) {
 });
 
 function playAudio(src) {
-    var audioElement = document.createElement('audio');
-    audioElement.setAttribute('src', src);
-    audioElement.play();
+    let media = new Audio(src);
+    const playPromise = media.play();
+    if (playPromise !== null) {
+        playPromise.catch(() => { });
+    }
+    return media;
 }
 
 connection.on("ReceiveMessage", function (message) {
