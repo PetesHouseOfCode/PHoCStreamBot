@@ -8,7 +8,7 @@ var connection = new signalR.HubConnectionBuilder().withUrl("/PHoCStreamBotHub")
 connection.on("ExecuteCommand", function (command, args) {
 
     if (command.toLowerCase() === 'hi_pete') {
-        $("#hiPete").fadeIn(600).delay(800).fadeOut(600);
+        $("#hiPete").fadeIn(600).delay(1500).fadeOut(600);
         playAudio('sounds/sup.m4a');
         return;
     }
