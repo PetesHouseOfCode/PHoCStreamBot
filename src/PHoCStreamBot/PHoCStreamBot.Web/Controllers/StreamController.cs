@@ -12,5 +12,10 @@ namespace PHoCStreamBot.Web.Controllers
         {
             return View();
         }
+
+        public IActionResult Canvas()
+        {
+            return View();
+        }
     }
 }
