@@ -1,18 +1,23 @@
-﻿class Text {
-    constructor(text, xPosition, yPosition, width) {
+﻿"use strict";
+
+class SpriteText {
+    position = Vector.point(0,0);
+
+    constructor(text, font, fillStyle) {
         this.text = text;
-        this.xPosition = xPosition;
-        this.yPosition = yPosition;
-        this.width = width;
+        this.font = font;
+        this.fillStyle = fillStyle;
     }
 
     update(frame) {
-
     }
 
-    render(ctx) {
-        ctx.fillStyle = "#FF0000";
-        ctx.font = "40px 'Saira Stencil One', cursive";
-        ctx.fillText(this.text, this.xPosition, this.yPosition);
+    setPosition(position){
+        this.position = position;
+    }
+    render(ctx, position) {
+        ctx.fillStyle = this.fillStyle;
+        ctx.font = this.font;
+        ctx.fillText(this.text, this.position.x, this.position.y);
     }
 }

@@ -10,16 +10,15 @@
 
         if (command.toLowerCase() === 'hi_pete') {
 
-            MyGame.sprites.push(new Text("HI PETE!!!!!!!!", 800, 500));
-            setTimeout(() => { MyGame.sprites.pop(); }, 5000);
-            playAudio('/sounds/sup.m4a');
+            MyGame.worldObjects.push(new Text("HI PETE!!!!!!!!", 800, 500));
+            setTimeout(() => { MyGame.worldObjects.pop(); }, 5000);
             return;
         }
 
         if (command === 'yell') {
 
-            MyGame.sprites.push(new Text(args, 800, 400));
-            setTimeout(() => { MyGame.sprites.pop(); }, 5000);
+            MyGame.worldObjects.push(new Text(args, 800, 400));
+            setTimeout(() => { MyGame.worldObjects.pop(); }, 5000);
             return;
         }
     });
@@ -42,53 +41,90 @@
     }
 
     function update(frame) {
-        MyGame.sprites.forEach((sprite) => sprite.update(frame));
+        MyGame.worldObjects.forEach((sprite) => sprite.update(frame));
     }
 
     function render(ctx) {
-        MyGame.sprites.forEach((sprite) => sprite.render(ctx));
-    }
-    
-    function playAudio(src) {
-        let media = new Audio(src);
-        const playPromise = media.play();
-        if (playPromise !== null) {
-            playPromise.catch(() => { });
-        }
-        return media;
+        MyGame.worldObjects.forEach((sprite) => sprite.render(ctx));
     }
 
     var image = new Image();
+    image.addEventListener("load",
+        () => {
+            let a = SpriteAnimation.singleRow(image, 2, 6, 3);
+            let logo = new Sprite([a], new Vector(300, 10));
+            MyGame.worldObjects.push(logo);
+        },
+        false);
     image.src = "/Images/Sprites/PeteHouseOfCode.png";
-    let logo = new Sprite(image, 128, 128, 2, 5);
-    logo.setPosition(300, 10);
-    MyGame.sprites.push(logo);
+
 
     var megaImage = new Image();
+    megaImage.addEventListener("load",
+        () => {
+            let a = SpriteAnimation.singleRow(megaImage, 3, 6);
+            MyGame.worldObjects.push(new Sprite([a], Vector.point(0, 50)));
+        },
+        false);
     megaImage.src = "/Images/Sprites/MegamanPush.png";
-    let megaSprite = new Sprite(megaImage, 124, 112, 3, 9);
-    megaSprite.setPosition(0, 0);
-    MyGame.sprites.push(megaSprite);
 
     var adventureImage = new Image();
-    adventureImage.src = "/Images/Sprites/adventurer-idle-2.png";
+    adventureImage.addEventListener("load",
+        () => {
+            let idle1 = new SpriteAnimation(
+                "idle1",
+                adventureImage,
+                0,
+                4,
+                50,
+                37,
+                7,
+                7,
+                1.5);
+            let jumpFlip = new SpriteAnimation(
+                "jumpFlip",
+                adventureImage,
+                14,
+                7,
+                50,
+                37,
+                7,
+                7,
+                2);
+            let jumpUp = new SpriteAnimation(
+                "jumpUp",
+                adventureImage,
+                29,
+                8,
+                50,
+                37,
+                7,
+                7,
+                3);
+            MyGame.worldObjects.push(new Sprite([idle1], Vector.point(100, 200)));
+            MyGame.worldObjects.push(new Sprite([jumpFlip], Vector.point(170, 200)));
+            MyGame.worldObjects.push(new Sprite([jumpUp], Vector.point(240, 200)));
+        },
+        false);
+    adventureImage.src = "/Images/Sprites/adventurer-sheet.png";
 
-    let adventureSprite = new Sprite(adventureImage, 100, 74, 4, 12);
-    adventureSprite.setPosition(100, 200);
-    MyGame.sprites.push(adventureSprite);
+    // let adventureSprite = new Sprite(adventureImage, 100, 74, 4, 12);
+    // adventureSprite.setPosition(100, 200);
+    // MyGame.sprites.push(adventureSprite);
 
 
-    let adventureSprite2 = new Sprite(adventureImage, 100, 74, 4, 4);
-    adventureSprite2.setPosition(100, 280);
-    MyGame.sprites.push(adventureSprite2);
+    // let adventureSprite2 = new Sprite(adventureImage, 100, 74, 4, 4);
+    // adventureSprite2.setPosition(100, 280);
+    // MyGame.sprites.push(adventureSprite2);
+    let text = new SpriteText("Just some wild and crazy text", "40px 'Saira Stencil One', cursive", "#FF0000");
+    let message = new Entity(text, Vector.point(10, 350), new Vector(0, 0), canvas.width, canvas.height);
+    MyGame.worldObjects.push(message);
 
-    MyGame.sprites.push(new Text("Test Font", 10, 500));
-
-    let e1 = new Entity(adventureSprite, new Vector(100, -50), canvas.width, canvas.height);
-    MyGame.sprites.push(e1);
+    // let e1 = new Entity(adventureSprite, new Vector(100, -50), canvas.width, canvas.height);
+    // MyGame.sprites.push(e1);
 
     connection.start().then(function () {
-        MyGame.progress = performance.now(); 
+        MyGame.progress = performance.now();
         main(performance.now());
     }).catch(function (err) {
         return console.error(err.toString());
