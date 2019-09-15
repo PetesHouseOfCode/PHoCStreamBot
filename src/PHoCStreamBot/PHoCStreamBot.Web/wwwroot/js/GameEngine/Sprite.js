@@ -1,12 +1,12 @@
 ﻿"use strict";
 
 class Sprite {
-    position = Vector.point(0, 0);
+    position = Vector.zero;
 
     constructor(animations, startingPosition) {
         this.animations = animations;
         this.currentAnimation = animations[0];
-        this.position = startingPosition;
+        this.position = startingPosition || Vector.zero;
     }
 
     setAnimation(name) {
@@ -21,7 +21,7 @@ class Sprite {
         this.currentAnimation.updateFrame(frame);
     }
 
-    render(ctx) {
-        this.currentAnimation.render(ctx, this.position);
+    render(ctx, position) {
+        this.currentAnimation.render(ctx, position || this.position);
     }
 }

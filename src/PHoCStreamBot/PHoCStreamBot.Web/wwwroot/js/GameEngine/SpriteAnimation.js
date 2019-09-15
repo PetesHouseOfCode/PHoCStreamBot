@@ -55,4 +55,8 @@ class SpriteAnimation {
     static singleRow(image, numFrames, frameRate, scale) {
         return new SpriteAnimation("default", image, 0, numFrames, Math.floor(image.width / numFrames), image.height, numFrames, frameRate, scale);
     }
+
+    static singleRow(image, numFrames, frameRate, scale) {
+        return new SpriteAnimation("default", image, 0, numFrames, Math.floor(image.width / numFrames), image.height, numFrames, frameRate, scale);
+    }
 }

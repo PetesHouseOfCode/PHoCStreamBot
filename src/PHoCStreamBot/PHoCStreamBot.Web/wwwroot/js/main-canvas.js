@@ -35,7 +35,8 @@
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         update({
             progress: MyGame.progress,
-            diff: MyGame.diff
+            diff: MyGame.diff,
+            secondsPassed: MyGame.diff / 1000
         });
         render(ctx);
     }
@@ -51,13 +52,31 @@
     var image = new Image();
     image.addEventListener("load",
         () => {
-            let a = SpriteAnimation.singleRow(image, 2, 6, 3);
+            let a = SpriteAnimation.singleRow(image, 2, 6);
             let logo = new Sprite([a], new Vector(300, 10));
             MyGame.worldObjects.push(logo);
         },
         false);
     image.src = "/Images/Sprites/PeteHouseOfCode.png";
 
+    let smokeImage = new Image();
+    smokeImage.addEventListener("load",
+        () => {
+            let smoke = new SpriteAnimation(
+                "idle1",
+                smokeImage,
+                0,
+                15,
+                256,
+                256,
+                5,
+                15,
+                1);
+            MyGame.worldObjects.push(new Emitter("first", Vector.point(500, 400), 10, Vector.point(-10, 4), new Sprite([smoke])));
+            MyGame.worldObjects.push(new Sprite([smoke], Vector.point(500, 0)));
+        },
+        false);
+    smokeImage.src = "/Images/Sprites/Smoke15Frames.png";
 
     var megaImage = new Image();
     megaImage.addEventListener("load",
@@ -102,8 +121,8 @@
                 7,
                 3);
             MyGame.worldObjects.push(new Sprite([idle1], Vector.point(100, 200)));
-            MyGame.worldObjects.push(new Sprite([jumpFlip], Vector.point(170, 200)));
-            MyGame.worldObjects.push(new Sprite([jumpUp], Vector.point(240, 200)));
+            //MyGame.worldObjects.push(new Sprite([jumpFlip], Vector.point(170, 200)));
+            //MyGame.worldObjects.push(new Sprite([jumpUp], Vector.point(240, 200)));
         },
         false);
     adventureImage.src = "/Images/Sprites/adventurer-sheet.png";
