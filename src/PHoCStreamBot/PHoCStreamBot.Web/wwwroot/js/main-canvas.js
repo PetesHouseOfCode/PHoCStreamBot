@@ -74,7 +74,9 @@
             "/Images/Sprites/sparkling-fireball.png",
             "/Images/Sprites/adventurer-sheet.png",
             "/Images/Sprites/MegamanPush.png",
-            "/Images/Sprites/Smoke15Frames.png"
+            "/Images/Sprites/Smoke15Frames.png",
+            "/Images/Sprites/sparkling-fireball.png",
+            "/Images/Sprites/bluestar.png"
         ],
         () => {
             MyGame.spriteSheets = [];
@@ -110,6 +112,22 @@
                     Vector.point(50, 37)
                 )
             );
+
+            MyGame.spriteSheets.push(
+                SpriteSheet.single("star", MyGame.images.find(image => image.name === "/Images/Sprites/bluestar.png").image, Vector.point(600, 600))
+            );
+
+            let flare = SpriteAnimation.single("default", MyGame.spriteSheets.find(sheet => sheet.name === "star"), 1, 0);
+            MyGame.worldObjects.push(
+                new Emitter(
+                    "first",
+                    Vector.point(500, 400),
+                    40,
+                    Vector.point(-10, 4),
+                    new Sprite({
+                        spriteAnimations: [flare],
+                        scale: 0.25
+                    })));
 
             let anim = SpriteAnimation.single(
                 "default",

@@ -17,7 +17,7 @@ class Emitter extends WorldObject {
                 let force = Math.floor(Math.random() * 300) - 100;
                 let direction = Math.floor(Math.random() * 180) + 180;
                 let vector = Vector.fromPolar(direction, force);
-                let acceleration = Vector.fromPolar(90, 50);
+                let acceleration = Vector.fromPolar(90, 0);
                 let p = new Particle(this.sprite, acceleration, 0.5);
                 p.init({
                     lifeExpectancy: Math.floor(Math.random() * 3000) + 1000,
@@ -42,6 +42,7 @@ class Emitter extends WorldObject {
                     position: this.position
                 });
             }
+
             particle.update(frame);
         })
     }
@@ -93,6 +94,7 @@ class Particle {
 
     render(ctx) {
         ctx.globalAlpha = this.opacity;
+        this.sprite.setPosition(this.position);
         this.sprite.render(ctx, this.position);
         ctx.globalAlpha = 1.0;
     }

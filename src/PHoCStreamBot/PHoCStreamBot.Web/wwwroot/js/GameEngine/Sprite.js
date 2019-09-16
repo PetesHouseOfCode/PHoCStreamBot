@@ -13,7 +13,7 @@ class Sprite {
      */
     constructor(props) {
         this.spriteAnimations = props.spriteAnimations;
-        this.position = props.position || Vector.position(0, 0);
+        this.position = props.position || Vector.point(0, 0);
         this.scale = props.scale || 1;
 
         this.currentAnimation = this.spriteAnimations[0];
