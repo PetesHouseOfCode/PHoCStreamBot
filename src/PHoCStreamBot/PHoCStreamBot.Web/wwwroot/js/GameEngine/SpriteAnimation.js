@@ -1,62 +1,71 @@
 "use strict";
 
-class SpriteAnimation {
+class SpriteSheet {
     name = "";
-    startFrame = 0;
-    currentFrame = 0;
-    lastFrameUpdate = 0;
+    image = new Image();
+    numColumns = 1;
+    cellSize = Vector.point(256, 256);
 
-    constructor(name, image, startFrame, numFrames, frameWidth, frameHeight, numColumns, frameRate, scale) {
+    constructor(name, image, numColumns, cellSize) {
         this.name = name;
         this.image = image;
+        this.numColumns = numColumns;
+        this.cellSize = cellSize;
+        Object.freeze(this);
+    }
+
+    static single(name, image, cellSize) {
+        return new SpriteSheet(name, image, 1, cellSize || Vector.point(image.width, image.height));
+    }
+
+    static singleRow(name, image, numColumns, cellSize) {
+        return new SpriteSheet(name, image, numColumns, cellSize || Vector.point(Math.floor(image.width / numColumns), image.height));
+    }
+}
+
+class SpriteAnimation {
+    /**
+     * 
+     * @param {string} name 
+     * @param {SpriteSheet} spriteSheet 
+     * @param {number} startFrame 
+     * @param {number} numFrames 
+     * @param {number} frameRate 
+     */
+    constructor(name, spriteSheet, startFrame, numFrames, frameRate) {
+        this.name = name;
+        this.spriteSheet = spriteSheet;
         this.startFrame = startFrame;
         this.numFrames = numFrames;
-        this.frameWidth = frameWidth;
-        this.frameHeight = frameHeight;
-        this.numColumns = numColumns;
         this.frameRate = frameRate;
-        this.scale = scale || 1;
+        Object.freeze(this);
     }
 
-    updateFrame(frame) {
-        if (this.lastFrameUpdate === 0) {
-            this.lastFrameUpdate = frame.progress;
-            return;
-        }
-
-        let timeDiff = frame.progress - this.lastFrameUpdate;
-        let frameTime = 1000 / this.frameRate;
-        let numFramesPassed = Math.floor(timeDiff / frameTime);
-        if (numFramesPassed > 0) {
-            this.currentFrame = (this.currentFrame + numFramesPassed) % this.numFrames;
-            this.lastFrameUpdate = frame.progress;
-        }
+    getWidthOffset(frameIndex) {
+        let sheetFrameIndex = this.startFrame + frameIndex;
+        let index = sheetFrameIndex % this.spriteSheet.numColumns;
+        return index * this.spriteSheet.cellSize.x;
     }
 
-    render(ctx, position) {
-        let sheetFrameIndex = this.startFrame + this.currentFrame;
-        ctx.drawImage(
-            this.image,
-            sheetFrameIndex % this.numColumns * this.frameWidth,
-            Math.floor(sheetFrameIndex / this.numColumns) * this.frameHeight,
-            this.frameWidth,
-            this.frameHeight,
-            position.x,
-            position.y,
-            this.frameWidth * this.scale,
-            this.frameHeight * this.scale);
-
+    getHeightOffset(frameIndex) {
+        let sheetFrameIndex = this.startFrame + frameIndex;
+        let index = Math.floor(sheetFrameIndex / this.spriteSheet.numColumns);
+        return index * this.spriteSheet.cellSize.y;
     }
 
-    static singleFrame(name, image, frameWidth, frameHeight, scale) {
-        return new SpriteAnimation(name, image, 1, frameWidth, frameHeight, 1, 0, scale);
+    getFrameWidth() {
+        return this.spriteSheet.cellSize.x;
     }
 
-    static singleRow(image, numFrames, frameRate, scale) {
-        return new SpriteAnimation("default", image, 0, numFrames, Math.floor(image.width / numFrames), image.height, numFrames, frameRate, scale);
+    getFrameHeight() {
+        return this.spriteSheet.cellSize.y;
     }
 
-    static singleRow(image, numFrames, frameRate, scale) {
-        return new SpriteAnimation("default", image, 0, numFrames, Math.floor(image.width / numFrames), image.height, numFrames, frameRate, scale);
+    static singleFrame(name, spriteSheet) {
+        return new SpriteAnimation(name, spriteSheet, 0, 1, 0);
+    }
+
+    static single(name, spriteSheet, numFrames, frameRate) {
+        return new SpriteAnimation(name, spriteSheet, 0, numFrames, frameRate);
     }
 }

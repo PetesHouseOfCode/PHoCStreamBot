@@ -14,13 +14,13 @@ class Emitter extends WorldObject {
     update(frame) {
         if (this.particles.length < this.numParticles) {
             for (let i = this.particles.length; i < this.numParticles; i++) {
-                let force = Math.floor(Math.random() * 100) - 20;
+                let force = Math.floor(Math.random() * 300) - 100;
                 let direction = Math.floor(Math.random() * 180) + 180;
                 let vector = Vector.fromPolar(direction, force);
                 let acceleration = Vector.fromPolar(90, 50);
                 let p = new Particle(this.sprite, acceleration, 0.5);
                 p.init({
-                    lifeExpectancy: Math.floor(Math.random() * 2000) + 3000,
+                    lifeExpectancy: Math.floor(Math.random() * 3000) + 1000,
                     force: vector,
                     startTime: frame.progress,
                     position: this.position
@@ -32,11 +32,11 @@ class Emitter extends WorldObject {
         this.particles.forEach((particle, index) => {
             if (particle.expired(frame.progress)) {
 
-                let force = Math.floor(Math.random() * 100) - 20;
+                let force = Math.floor(Math.random() * 300) - 100;
                 let direction = Math.floor(Math.random() * 180) + 180;
                 let vector = Vector.fromPolar(direction, force);
                 particle.init({
-                    lifeExpectancy: Math.floor(Math.random() * 5000) + 1000,
+                    lifeExpectancy: Math.floor(Math.random() * 3000) + 1000,
                     force: vector,
                     startTime: frame.progress,
                     position: this.position
