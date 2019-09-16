@@ -1,24 +1,33 @@
 ﻿"use strict";
 
-(function () {
-    let canvas = document.getElementById('screen');
+(function() {
+    let canvas = document.getElementById("screen");
+    let ctx = document.getElementById("screen").getContext("2d");
+    ctx.mozImageSmoothingEnabled = false;
+    ctx.webkitImageSmoothingEnabled = false;
+    ctx.msImageSmoothingEnabled = false;
+    ctx.imageSmoothingEnabled = false;
 
-    var connection = new signalR.HubConnectionBuilder().withUrl("/PHoCStreamBotHub").build();
+    var connection = new signalR.HubConnectionBuilder()
+        .withUrl("/PHoCStreamBotHub")
+        .build();
 
-    connection.on("ExecuteCommand", function (command, args) {
-        console.debug('Command executed: ' + command);
+    connection.on("ExecuteCommand", function(command, args) {
+        console.debug("Command executed: " + command);
 
-        if (command.toLowerCase() === 'hi_pete') {
-
+        if (command.toLowerCase() === "hi_pete") {
             MyGame.worldObjects.push(new Text("HI PETE!!!!!!!!", 800, 500));
-            setTimeout(() => { MyGame.worldObjects.pop(); }, 5000);
+            setTimeout(() => {
+                MyGame.worldObjects.pop();
+            }, 5000);
             return;
         }
 
-        if (command === 'yell') {
-
+        if (command === "yell") {
             MyGame.worldObjects.push(new Text(args, 800, 400));
-            setTimeout(() => { MyGame.worldObjects.pop(); }, 5000);
+            setTimeout(() => {
+                MyGame.worldObjects.pop();
+            }, 5000);
             return;
         }
     });
@@ -29,7 +38,6 @@
         MyGame.diff = tFrame - MyGame.progress;
         MyGame.progress = tFrame;
 
-        var ctx = document.getElementById('screen').getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "#000000";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -42,11 +50,11 @@
     }
 
     function update(frame) {
-        MyGame.worldObjects.forEach((sprite) => sprite.update(frame));
+        MyGame.worldObjects.forEach(sprite => sprite.update(frame));
     }
 
     function render(ctx) {
-        MyGame.worldObjects.forEach((sprite) => sprite.render(ctx));
+        MyGame.worldObjects.forEach(sprite => sprite.render(ctx));
     }
 
     function imageLoader(imagePaths, callback) {
@@ -83,22 +91,29 @@
             MyGame.spriteSheets.push(
                 SpriteSheet.singleRow(
                     "phoc-lights",
-                    MyGame.images.find(image => image.name === "/Images/Sprites/PeteHouseOfCode.png").image,
-                    2)
+                    MyGame.images.find(
+                        image => image.name === "/Images/Sprites/PeteHouseOfCode.png"
+                    ).image,
+                    2
+                )
             );
 
             MyGame.spriteSheets.push(
                 SpriteSheet.singleRow(
                     "megaman-poke",
-                    MyGame.images.find(image => image.name === "/Images/Sprites/MegamanPush.png").image,
+                    MyGame.images.find(
+                        image => image.name === "/Images/Sprites/MegamanPush.png"
+                    ).image,
                     3
                 )
-            )
+            );
 
             MyGame.spriteSheets.push(
                 new SpriteSheet(
                     "smoke1",
-                    MyGame.images.find(image => image.name === "/Images/Sprites/Smoke15Frames.png").image,
+                    MyGame.images.find(
+                        image => image.name === "/Images/Sprites/Smoke15Frames.png"
+                    ).image,
                     5,
                     Vector.point(256, 256)
                 )
@@ -107,17 +122,30 @@
             MyGame.spriteSheets.push(
                 new SpriteSheet(
                     "adventurer",
-                    MyGame.images.find(image => image.name === "/Images/Sprites/adventurer-sheet.png").image,
+                    MyGame.images.find(
+                        image => image.name === "/Images/Sprites/adventurer-sheet.png"
+                    ).image,
                     7,
                     Vector.point(50, 37)
                 )
             );
 
             MyGame.spriteSheets.push(
-                SpriteSheet.single("star", MyGame.images.find(image => image.name === "/Images/Sprites/bluestar.png").image, Vector.point(600, 600))
+                SpriteSheet.single(
+                    "star",
+                    MyGame.images.find(
+                        image => image.name === "/Images/Sprites/bluestar.png"
+                    ).image,
+                    Vector.point(600, 600)
+                )
             );
 
-            let flare = SpriteAnimation.single("default", MyGame.spriteSheets.find(sheet => sheet.name === "star"), 1, 0);
+            let flare = SpriteAnimation.single(
+                "default",
+                MyGame.spriteSheets.find(sheet => sheet.name === "star"),
+                1,
+                0
+            );
             MyGame.worldObjects.push(
                 new Emitter(
                     "first",
@@ -127,39 +155,50 @@
                     new Sprite({
                         spriteAnimations: [flare],
                         scale: 0.25
-                    })));
+                    })
+                )
+            );
 
             let anim = SpriteAnimation.single(
                 "default",
                 MyGame.spriteSheets.find(sheet => sheet.name === "phoc-lights"),
                 2,
-                4);
-            MyGame.worldObjects.push(new Sprite({
-                spriteAnimations: [anim],
-                position: Vector.point(200, 0),
-                scale: 1.0
-            }));
+                4
+            );
+            MyGame.worldObjects.push(
+                new Sprite({
+                    spriteAnimations: [anim],
+                    position: Vector.point(200, 0),
+                    scale: 1.0
+                })
+            );
 
             let megamanPoke = SpriteAnimation.single(
                 "default",
                 MyGame.spriteSheets.find(sheet => sheet.name === "megaman-poke"),
                 3,
-                6);
-            MyGame.worldObjects.push(new Sprite({
-                spriteAnimations: [megamanPoke],
-                position: Vector.point(0, 0),
-                scale: 1.0
-            }));
+                6
+            );
+            MyGame.worldObjects.push(
+                new Sprite({
+                    spriteAnimations: [megamanPoke],
+                    position: Vector.point(0, 0),
+                    scale: 1.0
+                })
+            );
 
             let smoke1 = SpriteAnimation.single(
                 "default",
                 MyGame.spriteSheets.find(sheet => sheet.name === "smoke1"),
                 15,
-                15);
-            MyGame.worldObjects.push(new Sprite({
-                spriteAnimations: [smoke1],
-                position: Vector.point(400, 0)
-            }));
+                15
+            );
+            MyGame.worldObjects.push(
+                new Sprite({
+                    spriteAnimations: [smoke1],
+                    position: Vector.point(400, 0)
+                })
+            );
 
             let adventurerIdle = new SpriteAnimation(
                 "idle",
@@ -193,30 +232,39 @@
                 12
             );
 
-            MyGame.worldObjects.push(new Sprite({
-                spriteAnimations: [adventurerForwardJump],
-                position: Vector.point(0, 200),
-                scale: 2
-            }));
+            MyGame.worldObjects.push(
+                new Sprite({
+                    spriteAnimations: [adventurerForwardJump],
+                    position: Vector.point(0, 200),
+                    scale: 2
+                })
+            );
 
-            MyGame.worldObjects.push(new Sprite({
-                spriteAnimations: [adventurerIdle],
-                position: Vector.point(100, 200),
-                scale: 2
-            }));
+            MyGame.worldObjects.push(
+                new Sprite({
+                    spriteAnimations: [adventurerIdle],
+                    position: Vector.point(100, 200),
+                    scale: 2
+                })
+            );
 
-            MyGame.worldObjects.push(new Sprite({
-                spriteAnimations: [adventurerAttackUp],
-                position: Vector.point(200, 200),
-                scale: 2
-            }));
+            MyGame.worldObjects.push(
+                new Sprite({
+                    spriteAnimations: [adventurerAttackUp],
+                    position: Vector.point(200, 200),
+                    scale: 2
+                })
+            );
 
-            MyGame.worldObjects.push(new Sprite({
-                spriteAnimations: [adventurerIdleSword],
-                position: Vector.point(300, 200),
-                scale: 2
-            }));
-        });
+            MyGame.worldObjects.push(
+                new Sprite({
+                    spriteAnimations: [adventurerIdleSword],
+                    position: Vector.point(300, 200),
+                    scale: 2
+                })
+            );
+        }
+    );
 
     // var image = new Image();
     // image.addEventListener("load",
@@ -365,21 +413,33 @@
     // adventureSprite.setPosition(100, 200);
     // MyGame.sprites.push(adventureSprite);
 
-
     // let adventureSprite2 = new Sprite(adventureImage, 100, 74, 4, 4);
     // adventureSprite2.setPosition(100, 280);
     // MyGame.sprites.push(adventureSprite2);
-    let text = new SpriteText("Just some wild and crazy text", "40px 'Saira Stencil One', cursive", "#FF0000");
-    let message = new Entity(text, Vector.point(10, 350), new Vector(0, 0), canvas.width, canvas.height);
+    let text = new SpriteText(
+        "Just some wild and crazy text",
+        "40px 'Saira Stencil One', cursive",
+        "#FF0000"
+    );
+    let message = new Entity(
+        text,
+        Vector.point(10, 350),
+        new Vector(0, 0),
+        canvas.width,
+        canvas.height
+    );
     MyGame.worldObjects.push(message);
 
     // let e1 = new Entity(adventureSprite, new Vector(100, -50), canvas.width, canvas.height);
     // MyGame.sprites.push(e1);
 
-    connection.start().then(function () {
-        MyGame.progress = performance.now();
-        main(performance.now());
-    }).catch(function (err) {
-        return console.error(err.toString());
-    });
+    connection
+        .start()
+        .then(function() {
+            MyGame.progress = performance.now();
+            main(performance.now());
+        })
+        .catch(function(err) {
+            return console.error(err.toString());
+        });
 })();
