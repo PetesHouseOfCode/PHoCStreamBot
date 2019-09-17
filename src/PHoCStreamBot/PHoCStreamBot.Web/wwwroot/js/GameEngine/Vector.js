@@ -16,13 +16,13 @@ class Vector {
 
     static fromPolar(degrees, distance) {
         // 1° × π/180 
-        var radians = degrees * Math.PI / 180;
+        var radians = degrees * MathEx.pieRadian;
     
         /* 
          x = r × cos( θ )
          y = r × sin( θ )
         */
-        return new Vector(distance * Math.cos(radians), distance * Math.sin(radians));
+        return new Vector(Math.floor(distance * Math.cos(radians)), Math.floor(distance * Math.sin(radians)));
       }
 
     add(vector) {
