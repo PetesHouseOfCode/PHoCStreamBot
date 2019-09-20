@@ -17,5 +17,10 @@ namespace PHoCStreamBot.Web.Controllers
         {
             return View();
         }
+
+        public IActionResult Phaser()
+        {
+            return View();
+        }
     }
 }
