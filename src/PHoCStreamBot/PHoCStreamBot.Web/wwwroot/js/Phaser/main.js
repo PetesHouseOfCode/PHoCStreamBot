@@ -12,8 +12,7 @@ var config = {
     },
     scene: {
         preload: preload,
-        create: create,
-        update: update
+        create: create
     },
     transparent: true
 };
@@ -33,6 +32,7 @@ function preload ()
     //this.load.spritesheet('smoke', '/Images/Sprites/Smoke15Frames.png', { frameWidth: 256, frameHeight: 256 });
     this.load.image('pete-cyclops', '/Images/CyclopsPete-small.png');
     this.load.image('pete-cyclops-fade', '/Images/CyclopsPete-small-fade.png');
+
 }
 
 function create ()
@@ -43,32 +43,29 @@ function create ()
     //logo.setBounce(1, 1);
     //logo.setCollideWorldBounds(true);
     //emitter.startFollow(logo);
+    var circle = new Phaser.Geom.Circle(0, 0, 150);
 
     var particles = game.scene.scenes[0].add.particles('pete-cyclops-fade');
 
         emitter = particles.createEmitter({
-            timeScale: .6,
+            timeScale: 1,
             bounce: true,
+            lifespan: 5000,
             speed: 400,
             //angle: { min: 180, max: 360 },
             scale: { start: .9, end: 0 },
             blendMode:'ADD',
             x: 1920/2,
-            y: 1080/2
+            y: 1080/2,
+            emitZone: { type: 'random', source: circle, quantity: 20 },
+            gravityY: 200
         });
 
         emitter.stop();
-}
-
-var angle = 180;
-
-function update() {
-    angle += 10;
-    if(angle >=360){
-        angle = 0;
-    }
-
-    //emitter.setAngle({ min: angle, max: angle + 180});
+        emitter.start();
+        setTimeout(() => {
+            emitter.stop();
+        }, 5000);
 }
 
 var connection = new signalR.HubConnectionBuilder()
@@ -82,13 +79,7 @@ connection.on("ExecuteCommand", function(command, args) {
         emitter.start();
         setTimeout(() => {
             emitter.stop();
-            setTimeout(()=> {
-                emitter.start();
-                setTimeout(()=>{
-                    emitter.stop();
-                }, 800);
-            }, 400);
-        }, 800);
+        }, 5000);
         return;
     }
 
