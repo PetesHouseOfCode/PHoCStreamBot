@@ -1,4 +1,5 @@
 "use strict";
+import loadingScene from "./loadingscene.js";
 
 var config = {
     type: Phaser.AUTO,
@@ -25,7 +26,7 @@ function preload ()
     this.load.image('blue', '/Images/Sprites/bluestar.png');
 
     //this.load.setBaseURL('');
-
+console.log(loadingScene);
     //this.load.image('sky', 'assets/skies/space3.png');
     this.load.image('logo', 'https://labs.phaser.io/assets/sprites/phaser3-logo.png');
     this.load.image('red', 'https://labs.phaser.io/assets/particles/red.png');
