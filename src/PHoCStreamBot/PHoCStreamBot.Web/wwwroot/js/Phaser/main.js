@@ -63,10 +63,10 @@ function create ()
         });
 
         emitter.stop();
-        emitter.start();
-        setTimeout(() => {
-            emitter.stop();
-        }, 5000);
+        // emitter.start();
+        // setTimeout(() => {
+        //     emitter.stop();
+        // }, 5000);
 }
 
 var connection = new signalR.HubConnectionBuilder()

@@ -1,0 +1,7 @@
+@model PHoCStreamBot.Web.Controllers.SendCommandModel
+@using(Html.BeginForm())
+{
+    @Html.TextBoxFor(model => model.CommandName);
+    @Html.TextBoxFor(model => model.Args);
+    <button type="submit">Send</button>
+}
