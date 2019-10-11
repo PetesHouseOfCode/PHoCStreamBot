@@ -20,6 +20,7 @@ var config = {
 
 var game = new Phaser.Game(config);
 var emitter;
+var text1;
 
 function preload ()
 {
@@ -44,9 +45,13 @@ function create ()
     //logo.setBounce(1, 1);
     //logo.setCollideWorldBounds(true);
     //emitter.startFollow(logo);
+
+    text1 = this.add.text(400, 100, '', {fontSize: "35px"});
+    text1.setTint(0xff00ff, 0xffff00, 0x0000ff, 0xff0000);
+
     var circle = new Phaser.Geom.Circle(0, 0, 150);
 
-    var particles = game.scene.scenes[0].add.particles('pete-cyclops-fade');
+    var particles = this.add.particles('pete-cyclops-fade');
 
         emitter = particles.createEmitter({
             timeScale: 1,
@@ -85,8 +90,11 @@ connection.on("ExecuteCommand", function(command, args) {
     }
 
     if (command === "yell") {
-       
-        return;
+       text1.text = args;
+       setTimeout(()=>{
+           text1.text = "";
+       }, 3000);
+       return;
     }
 });
 
