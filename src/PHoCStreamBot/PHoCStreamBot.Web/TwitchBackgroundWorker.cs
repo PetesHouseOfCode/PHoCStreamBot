@@ -47,7 +47,7 @@ namespace PHoCStreamBot.Web
         {
             var command = new BotCommand(e.Command.CommandText, e.Command.ArgumentsAsList);
             var def = commandDefs.FirstOrDefault(x => x.CommandText == command.CommandText);
-            if (def != default)
+            if (def != null)
             {
                 def.Handler.Handle(command);
             }
