@@ -3,14 +3,6 @@
   "defaultProvider": "unpkg",
   "libraries": [
     {
-      "library": "@aspnet/signalr@1.0.4",
-      "destination": "wwwroot/lib/signalr/",
-      "files": [
-        "dist/browser/signalr.js",
-        "dist/browser/signalr.min.js"
-      ]
-    },
-    {
       "library": "toastr@2.1.4",
       "destination": "wwwroot/lib/toastr/",
       "files": [
@@ -18,6 +10,16 @@
         "build/toastr.js.map",
         "build/toastr.min.css",
         "build/toastr.min.js"
+      ]
+    },
+    {
+      "library": "@aspnet/signalr@1.1.4",
+      "destination": "wwwroot/lib/signalr/",
+      "files": [
+        "dist/browser/signalr.js",
+        "dist/browser/signalr.js.map",
+        "dist/browser/signalr.min.js",
+        "dist/browser/signalr.min.js.map"
       ]
     }
   ]

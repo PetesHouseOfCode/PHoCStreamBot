@@ -1,5 +1,7 @@
 "use strict";
-import loadingScene from "./loadingscene.js";
+import messageTypes from "./message-types.js";
+import MainScene from "./main-scene.js";
+import PubSub from "./PubSub.js";
 
 var config = {
     type: Phaser.AUTO,
@@ -11,93 +13,29 @@ var config = {
             gravity: { y: 200 }
         }
     },
-    scene: {
-        preload: preload,
-        create: create
-    },
+    scene: MainScene,
     transparent: true
 };
 
 var game = new Phaser.Game(config);
-var emitter;
-var text1;
-
-function preload ()
-{
-    this.load.image('blue', '/Images/Sprites/bluestar.png');
-
-    //this.load.setBaseURL('');
-console.log(loadingScene);
-    //this.load.image('sky', 'assets/skies/space3.png');
-    this.load.image('logo', 'https://labs.phaser.io/assets/sprites/phaser3-logo.png');
-    this.load.image('red', 'https://labs.phaser.io/assets/particles/red.png');
-    //this.load.spritesheet('smoke', '/Images/Sprites/Smoke15Frames.png', { frameWidth: 256, frameHeight: 256 });
-    this.load.image('pete-cyclops', '/Images/CyclopsPete-small.png');
-    this.load.image('pete-cyclops-fade', '/Images/CyclopsPete-small-fade.png');
-
-}
-
-function create ()
-{
-    //this.add.image(400, 300, 'sky');
-    //var logo = this.physics.add.image(400, 100, 'logo');
-    //logo.setVelocity(0, 0);
-    //logo.setBounce(1, 1);
-    //logo.setCollideWorldBounds(true);
-    //emitter.startFollow(logo);
-
-    text1 = this.add.text(400, 100, '', {fontSize: "35px"});
-    text1.setTint(0xff00ff, 0xffff00, 0x0000ff, 0xff0000);
-
-    var circle = new Phaser.Geom.Circle(0, 0, 150);
-
-    var particles = this.add.particles('pete-cyclops-fade');
-
-        emitter = particles.createEmitter({
-            timeScale: 1,
-            bounce: true,
-            lifespan: 5000,
-            speed: 400,
-            //angle: { min: 180, max: 360 },
-            scale: { start: .9, end: 0 },
-            blendMode:'ADD',
-            x: 1920/2,
-            y: 1080/2,
-            emitZone: { type: 'random', source: circle, quantity: 20 },
-            gravityY: 200
-        });
-
-        emitter.stop();
-        // emitter.start();
-        // setTimeout(() => {
-        //     emitter.stop();
-        // }, 5000);
-}
 
 var connection = new signalR.HubConnectionBuilder()
     .withUrl("/PHoCStreamBotHub")
     .build();
 
-connection.on("ExecuteCommand", function(command, args) {
+connection.on("ExecuteCommand", function (command, args) {
     console.debug("Command executed: " + command);
 
     if (command.toLowerCase() === "hi_pete") {
-        emitter.start();
-        setTimeout(() => {
-            emitter.stop();
-        }, 5000);
+        PubSub.dispatch(messageTypes.hiPete);
         return;
     }
 
     if (command === "yell") {
-       text1.text = args;
-       setTimeout(()=>{
-           text1.text = "";
-       }, 3000);
-       return;
+        PubSub.dispatch(messageTypes.yell, args);
+        return;
     }
 });
-
 
 connection
     .start()
