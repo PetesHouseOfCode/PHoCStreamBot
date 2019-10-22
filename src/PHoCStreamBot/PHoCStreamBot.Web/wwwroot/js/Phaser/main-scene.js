@@ -5,7 +5,6 @@ import PubSub from "./PubSub.js";
 export default class MainScene extends Phaser.Scene {
     constructor() {
         super();
-        this.emitter = null;
         this.text1 = null;
     }
 
@@ -23,31 +22,33 @@ export default class MainScene extends Phaser.Scene {
         this.text1 = this.add.text(400, 100, '', { fontSize: "35px" });
         this.text1.setTint(0xff00ff, 0xffff00, 0x0000ff, 0xff0000);
 
-        const circle = new Phaser.Geom.Circle(0, 0, 150);
+        this.graphics = this.add.graphics();
+    }
 
+    hiPete(message) {
+        const circle = new Phaser.Geom.Circle(1920 / 2, 1080 / 2, 150);
+        this.graphics.strokeCircleShape(circle);
         const particles = this.add.particles('pete-cyclops-fade');
-
-        this.emitter = particles.createEmitter({
+        var emitter = particles.createEmitter({
             timeScale: 1,
             bounce: true,
-            lifespan: 5000,
+            lifespan: 2000,
             speed: 400,
             //angle: { min: 180, max: 360 },
-            scale: { start: .9, end: 0 },
+            scale: { start: .3, end: 1.6 },
             blendMode: 'ADD',
-            x: 1920 / 2,
-            y: 1080 / 2,
+            //x: 1920 / 2,
+            //y: 1080 / 2,
+            alpha: { start: .9, end: 0 },
             emitZone: { type: 'random', source: circle, quantity: 20 },
             gravityY: 200
         });
 
-        this.emitter.stop();
-    }
-
-    hiPete(message) {
-        this.emitter.start();
         setTimeout(() => {
-            this.emitter.stop();
+            emitter.stop();
+            this.time.delayedCall(3000, () => {
+                particles.destroy();
+            });
         }, 5000);
     }
 

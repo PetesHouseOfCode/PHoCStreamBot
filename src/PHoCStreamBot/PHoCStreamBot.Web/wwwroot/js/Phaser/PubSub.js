@@ -80,8 +80,8 @@ function messageHasSubscribers(message) {
 }
 
 export default {
-    receive(message, func, context) {
-        if (typeof func !== 'function') {
+    receive(message, action, context) {
+        if (typeof action !== 'function') {
             return false;
         }
 
@@ -95,7 +95,7 @@ export default {
         }
 
         var token = 'uid_' + String(++lastUid);
-        messages[message][token] = { func: func, context: context };
+        messages[message][token] = { func: action, context: context };
 
         // return token for unsubscribing
         return token;
