@@ -18,6 +18,7 @@ export default class MainScene extends Phaser.Scene {
     create() {
         PubSub.receive(messageTypes.hiPete, this.hiPete, this);
         PubSub.receive(messageTypes.yell, this.yell, this);
+        PubSub.receive(messageTypes.popEmote, this.popEmote, this);
 
         this.text1 = this.add.text(400, 100, '', { fontSize: "35px" });
         this.text1.setTint(0xff00ff, 0xffff00, 0x0000ff, 0xff0000);
@@ -25,7 +26,7 @@ export default class MainScene extends Phaser.Scene {
         this.graphics = this.add.graphics();
     }
 
-    hiPete(message) {
+    hiPete(messageType) {
         const circle = new Phaser.Geom.Circle(1920 / 2, 1080 / 2, 150);
         this.graphics.strokeCircleShape(circle);
         const particles = this.add.particles('pete-cyclops-fade');
@@ -52,10 +53,38 @@ export default class MainScene extends Phaser.Scene {
         }, 5000);
     }
 
-    yell(message, text) {
+    yell(messageType, text) {
         this.text1.text = text;
         setTimeout(() => {
             this.text1.text = "";
         }, 3000);
+    }
+
+    popEmote(messageType, message) {
+        this.load.image(message.id, message.url);
+        this.load.start();
+        let emoteName = message.id;
+        setTimeout(() => {
+            var circle = new Phaser.Geom.Circle(0, 0, 150);
+            var particles = this.add.particles(emoteName);
+
+            let emitter2 = particles.createEmitter({
+                timeScale: 1,
+                bounce: true,
+                lifespan: 5000,
+                speed: 400,
+                //angle: { min: 180, max: 360 },
+                scale: { start: 2, end: 0 },
+                blendMode: 'ADD',
+                x: 1920 / 2,
+                y: 1080 / 2,
+                emitZone: { type: 'random', source: circle, quantity: 20 },
+                gravityY: 200
+            });
+
+            setTimeout(() => {
+                emitter2.stop();
+            }, 5000);
+        }, 1500);
     }
 }

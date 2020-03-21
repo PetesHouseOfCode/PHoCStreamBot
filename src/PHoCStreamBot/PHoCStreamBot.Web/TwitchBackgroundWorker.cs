@@ -77,7 +77,8 @@ namespace PHoCStreamBot.Web
                     UserName = e.ChatMessage.Username,
                     DisplayName = e.ChatMessage.DisplayName,
                     Text = e.ChatMessage.Message,
-                    UserNameColor = e.ChatMessage.ColorHex
+                    UserNameColor = e.ChatMessage.ColorHex,
+                    Emotes = e.ChatMessage.EmoteSet.Emotes
                 });
             }
         }

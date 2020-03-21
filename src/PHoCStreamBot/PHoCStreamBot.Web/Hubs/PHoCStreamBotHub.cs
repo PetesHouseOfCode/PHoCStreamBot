@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TwitchLib.Client.Models;
 
 namespace PHoCStreamBot.Web.Hubs
 {
@@ -30,5 +31,6 @@ namespace PHoCStreamBot.Web.Hubs
         public string DisplayName { get; set; }
         public string Text { get; set; }
         public string UserNameColor { get; set; }
+        public List<Emote> Emotes {get;set;} = new List<Emote>();
     }
 }
