@@ -37,6 +37,22 @@ connection.on("ExecuteCommand", function (command, args) {
     }
 });
 
+connection.on("ReceiveMessage", function(message){
+    console.debug("Signlr Received: ReceiveMessage");
+    console.debug(message);
+    
+    if(message.emotes.length > 0) {
+        for(let i = 0; i < message.emotes.length; i++) {
+            let args = {
+                id: message.emotes[i].name,
+                url: message.emotes[i].imageUrl
+            };
+
+            PubSub.dispatch(messageTypes.popEmote, args);
+        }
+    }
+});
+
 connection
     .start()
     .catch(function(err) {

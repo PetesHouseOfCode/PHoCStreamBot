@@ -2,5 +2,6 @@
 
 export default {
     hiPete: Symbol("event.hiPete"),
-    yell: Symbol("event.yell")
+    yell: Symbol("event.yell"),
+    popEmote: Symbol("event.popEmote")
 };
