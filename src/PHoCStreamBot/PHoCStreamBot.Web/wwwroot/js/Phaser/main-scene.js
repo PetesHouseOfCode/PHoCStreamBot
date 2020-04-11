@@ -7,6 +7,8 @@ export default class MainScene extends Phaser.Scene {
         super();
         this.text1 = null;
         this.imagesLoaded = [];
+        this.rockets = [];
+        this.degree = 0.0174533;
     }
 
     preload() {
@@ -14,6 +16,7 @@ export default class MainScene extends Phaser.Scene {
         //this.load.spritesheet('smoke', '/Images/Sprites/Smoke15Frames.png', { frameWidth: 256, frameHeight: 256 });
         this.load.image('pete-cyclops', '/Images/CyclopsPete-small.png');
         this.load.image('pete-cyclops-fade', '/Images/CyclopsPete-small-fade.png');
+        this.load.image('test-emote', 'https://static-cdn.jtvnw.net/emoticons/v1/499/1.0');
     }
 
     create() {
@@ -25,6 +28,49 @@ export default class MainScene extends Phaser.Scene {
         this.text1.setTint(0xff00ff, 0xffff00, 0x0000ff, 0xff0000);
 
         this.graphics = this.add.graphics();
+
+        let particle = this.add.particles('test-emote');
+
+        let rocket = {
+            item: this.physics.add.image(300, 1080, 'test-emote'),
+            particle: particle,
+            emitter: particle.createEmitter({
+                x: 300, 
+                y: 1080,
+                lifespan: 500,
+                speed: { min: 5, max: 15 },
+                scale: { start: .7, end: 0 },
+                emitZone: { type: 'edge', source: new Phaser.Geom.Circle(0, 0, 1), quantity: 10 },
+                gravityY: 100,
+            }, this),
+            acceleration: new Phaser.Math.Vector2()
+        };
+        rocket.item.setVelocity(100, -600);
+        this.rockets.push(rocket);
+    }
+
+    update() {
+        this.updateRockets();
+    }
+
+    updateRockets() {
+        this.rockets.forEach((rocket) => {this.updateRocket(rocket)});
+    }
+
+    updateRocket(rocket) {
+        if(rocket.item.body.velocity.y > 0) {
+            console.log('explode');
+            rocket.emitter.setLifespan(3000);
+            rocket.emitter.setSpeed({min: 100, max: 150});
+            rocket.emitter.setQuantity(100);
+            rocket.emitter.setEmitZone({ type: 'edge', source: new Phaser.Geom.Circle(0, 0, 5), quantity: 30 })
+            rocket.emitter.explode();
+            rocket.item.setVelocity(0,0);
+            rocket.item.visible = false;
+            rocket.item.body.enable = false;            
+        } else {
+            rocket.emitter.setPosition(rocket.item.x, rocket.item.y);
+        }        
     }
 
     hiPete(messageType) {
