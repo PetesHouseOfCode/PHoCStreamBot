@@ -6,6 +6,7 @@ export default class MainScene extends Phaser.Scene {
     constructor() {
         super();
         this.text1 = null;
+        this.imagesLoaded = [];
     }
 
     preload() {
@@ -61,30 +62,103 @@ export default class MainScene extends Phaser.Scene {
     }
 
     popEmote(messageType, message) {
-        this.load.image(message.id, message.url);
-        this.load.start();
-        let emoteName = message.id;
-        setTimeout(() => {
-            var circle = new Phaser.Geom.Circle(0, 0, 150);
-            var particles = this.add.particles(emoteName);
-
-            let emitter2 = particles.createEmitter({
-                timeScale: 1,
-                bounce: true,
-                lifespan: 5000,
-                speed: 400,
-                //angle: { min: 180, max: 360 },
-                scale: { start: 2, end: 0 },
-                blendMode: 'ADD',
-                x: 1920 / 2,
-                y: 1080 / 2,
-                emitZone: { type: 'random', source: circle, quantity: 20 },
-                gravityY: 200
-            });
-
-            setTimeout(() => {
-                emitter2.stop();
-            }, 5000);
-        }, 1500);
+        this.load.on('filecomplete-image-' + message.id, (file) => {
+            console.log('loaded image: ' + file);
+            this.imagesLoaded.push(file);
+            this.createEmoteEffect(file);
+        }, this);
+        if (this.imagesLoaded.indexOf(message.id) >= 0) {
+            console.log('found image: ' + message.id);
+            this.createEmoteEffect(message.id);
+        } else {
+            console.log('missing image: ' + message.id);
+            this.load.image(message.id, message.url);
+            this.load.start();
+        }
     }
+
+    createEmoteEffect(imageId) {
+        var particles = this.add.particles(imageId);
+        var emitterIndex = Math.floor(Math.random() * this.emitterPositions.length);
+        var emitConfig = this.emitterPositions[emitterIndex];
+        //var emitConfig = this.emitterPositions[3];
+        let emitter2 = particles.createEmitter({
+            timeScale: 1,
+            bounce: true,
+            lifespan: emitConfig.lifespan,
+            speed: emitConfig.speed,
+            angle: emitConfig.angle,
+            scale: emitConfig.scale,
+            blendMode: emitConfig.blendMode,
+            x: emitConfig.x,
+            y: emitConfig.y,
+            emitZone: emitConfig.emitZone,
+            gravityY: emitConfig.gravityY,
+            rotate: { min: -30, max: 30 },
+            quantity: emitConfig.quantity
+        }, this);
+
+        var timeout = Math.floor(2000 + (Math.random() * 3000))
+        setTimeout(() => {
+            emitter2.stop();
+            this.load.off('filecomplete-image-' + imageId);
+        }, timeout);
+    }
+
+    emitterPositions = [
+        {
+            blendMode: 'ADD',
+            lifespan: 3000,
+            speed: {min: 300, max: 800 },
+            scale: { start: 1.5, end: 0 },
+            x: 300,
+            y: 1080,
+            angle: {min: 265, max: 275},
+            emitZone: { type: 'random', source: new Phaser.Geom.Circle(0, 0, 50), quantity: 1 },
+            gravityY: 800
+        },
+        {
+            blendMode: 'SCREEN',
+            lifespan: 500,
+            speed: {min: -100, max: 100},
+            scale: { start: 1, end: 0 },
+            x: 1780,
+            y: 110,
+            emitZone: { type: 'edge', source: new Phaser.Geom.Rectangle(-220, -100, 320, 200), quantity: 25 },
+            gravityY: 200
+        },
+        {
+            blendMode: 'SCREEN',
+            lifespan: 500,
+            speed: {min: -100, max: 100},
+            scale: { start: 1, end: 0 },
+            x: 1780,
+            y: 110,
+            emitZone: { type: 'edge', source: new Phaser.Geom.Rectangle(-220, -100, 320, 200), quantity: 25 },
+            quantity: 8,
+            gravityY: 200
+        },
+        {
+            blendMode: 'SCREEN',
+            lifespan: 500,
+            speed: {min: -100, max: 100},
+            scale: { start: 1, end: 0 },
+            x: 270,
+            y: 110,
+            emitZone: { type: 'edge', source: new Phaser.Geom.Rectangle(-240, -100, 340, 200), quantity: 25 },
+            quantity: 8,
+            gravityY: 200
+        },
+        {
+            blendMode: 'SCREEN',
+            lifespan: 500,
+            speed: {min: -100, max: 100},
+            scale: { start: 1, end: 0 },
+            x: 1920 / 2,
+            y: 1080 / 2,
+            emitZone: { type: 'edge', source: new Phaser.Geom.Circle(0, 0, 200), quantity: 25 },
+            quantity: 8,
+            gravityY: 200
+        },
+    ];
 }
