@@ -1,6 +1,7 @@
 ﻿"use strict";
 import messageTypes from "./message-types.js";
 import PubSub from "./PubSub.js";
+import RocketContainer from "./RocketContainer.js";
 
 export default class MainScene extends Phaser.Scene {
     constructor() {
@@ -8,6 +9,7 @@ export default class MainScene extends Phaser.Scene {
         this.text1 = null;
         this.imagesLoaded = [];
         this.rockets = [];
+        this.rockets2 = [];
         this.degree = 0.0174533;
     }
 
@@ -17,6 +19,8 @@ export default class MainScene extends Phaser.Scene {
         this.load.image('pete-cyclops', '/Images/CyclopsPete-small.png');
         this.load.image('pete-cyclops-fade', '/Images/CyclopsPete-small-fade.png');
         this.load.image('test-emote', 'https://static-cdn.jtvnw.net/emoticons/v1/499/1.0');
+        this.load.audio('firework-launch-01', '/sounds/firework-single-launch-01.wav');
+        this.load.audio('firework-pop-01', '/sounds/firework-pop-01.wav');
     }
 
     create() {
@@ -28,14 +32,13 @@ export default class MainScene extends Phaser.Scene {
         this.text1.setTint(0xff00ff, 0xffff00, 0x0000ff, 0xff0000);
 
         this.graphics = this.add.graphics();
-
+        
         let particle = this.add.particles('test-emote');
-
         let rocket = {
             item: this.physics.add.image(300, 1080, 'test-emote'),
             particle: particle,
             emitter: particle.createEmitter({
-                x: 300, 
+                x: 300,
                 y: 1080,
                 lifespan: 500,
                 speed: { min: 5, max: 15 },
@@ -47,30 +50,48 @@ export default class MainScene extends Phaser.Scene {
         };
         rocket.item.setVelocity(100, -600);
         this.rockets.push(rocket);
+
+        this.rockets2.push(new RocketContainer(this, 400, 1080, 'test-emote', 'firework-launch-01', 'firework-pop-01', { x: 100, y: -600 }));
+
+        this.input.on('pointerdown', function (pointer) {
+            let rocket = this.rockets2.filter((rocket) => !rocket.active);
+            if(rocket.length > 0)
+            {
+                rocket[0].restart(500, 1080, 'test-emote', {x: 100, y:-600});
+            }
+            this.rockets2.push(new RocketContainer(this, 400, 1080, 'test-emote', 'firework-launch-01', 'firework-pop-01', { x: 100, y: -600 }))
+        }, this);
     }
 
     update() {
         this.updateRockets();
+        this.rockets2.forEach((rocket) => { if(rocket.active) this.updateRocket2(rocket); });
     }
 
     updateRockets() {
-        this.rockets.forEach((rocket) => {this.updateRocket(rocket)});
+        this.rockets.forEach((rocket) => { this.updateRocket(rocket) });
     }
 
     updateRocket(rocket) {
-        if(rocket.item.body.velocity.y > 0) {
+        if (rocket.item.body.velocity.y > 0) {
             console.log('explode');
             rocket.emitter.setLifespan(3000);
-            rocket.emitter.setSpeed({min: 100, max: 150});
+            rocket.emitter.setSpeed({ min: 100, max: 150 });
             rocket.emitter.setQuantity(100);
             rocket.emitter.setEmitZone({ type: 'edge', source: new Phaser.Geom.Circle(0, 0, 5), quantity: 30 })
             rocket.emitter.explode();
-            rocket.item.setVelocity(0,0);
+            rocket.item.setVelocity(0, 0);
             rocket.item.visible = false;
-            rocket.item.body.enable = false;            
+            rocket.item.body.enable = false;
         } else {
             rocket.emitter.setPosition(rocket.item.x, rocket.item.y);
-        }        
+        }
+    }
+
+    updateRocket2(rocket) {
+        if (rocket.body.velocity.y > 100) {
+            rocket.explode();
+        }
     }
 
     hiPete(messageType) {
@@ -155,18 +176,18 @@ export default class MainScene extends Phaser.Scene {
         {
             blendMode: 'ADD',
             lifespan: 3000,
-            speed: {min: 300, max: 800 },
+            speed: { min: 300, max: 800 },
             scale: { start: 1.5, end: 0 },
             x: 300,
             y: 1080,
-            angle: {min: 265, max: 275},
+            angle: { min: 265, max: 275 },
             emitZone: { type: 'random', source: new Phaser.Geom.Circle(0, 0, 50), quantity: 1 },
             gravityY: 800
         },
         {
             blendMode: 'SCREEN',
             lifespan: 500,
-            speed: {min: -100, max: 100},
+            speed: { min: -100, max: 100 },
             scale: { start: 1, end: 0 },
             x: 1780,
             y: 110,
@@ -176,7 +197,7 @@ export default class MainScene extends Phaser.Scene {
         {
             blendMode: 'SCREEN',
             lifespan: 500,
-            speed: {min: -100, max: 100},
+            speed: { min: -100, max: 100 },
             scale: { start: 1, end: 0 },
             x: 1780,
             y: 110,
@@ -187,7 +208,7 @@ export default class MainScene extends Phaser.Scene {
         {
             blendMode: 'SCREEN',
             lifespan: 500,
-            speed: {min: -100, max: 100},
+            speed: { min: -100, max: 100 },
             scale: { start: 1, end: 0 },
             x: 270,
             y: 110,
@@ -198,7 +219,7 @@ export default class MainScene extends Phaser.Scene {
         {
             blendMode: 'SCREEN',
             lifespan: 500,
-            speed: {min: -100, max: 100},
+            speed: { min: -100, max: 100 },
             scale: { start: 1, end: 0 },
             x: 1920 / 2,
             y: 1080 / 2,
