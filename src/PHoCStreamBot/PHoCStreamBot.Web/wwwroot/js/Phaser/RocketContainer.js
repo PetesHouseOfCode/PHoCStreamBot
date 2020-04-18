@@ -10,11 +10,11 @@ export default class RocketContainers extends Phaser.GameObjects.Container {
     // enable physics
     this.scene.physics.world.enable(this);
 
+    this.launchSound = this.scene.sound.add(launchKey);
+    this.popSound = this.scene.sound.add(popKey);
 
     this.circle =  new Phaser.Geom.Circle(0, 0, 1);
     this.explodeShape = new Phaser.Geom.Triangle(-50, 0, 0, -50, 50, 50);
-    // this.explodeShape = new Phaser.Geom.Rectangle(-220, -100, 320, 200);
-    // Phaser.Geom.Triangle.Rotate(this.explodeShape, 25);
 
     this.particle = this.scene.add.particles(this.imageKey);
     this.emitter = this.particle
@@ -27,16 +27,16 @@ export default class RocketContainers extends Phaser.GameObjects.Container {
         emitZone: { type: 'edge', source: this.circle, quantity: 10 },
         gravityY: 100,
       }, this);
-
-    //this.scene.add.existing(this.particle);
-    this.launchSound = this.scene.sound.add(launchKey);
-    this.popSound = this.scene.sound.add(popKey);
+    this.particle.setDepth(1);
 
     this.rocket = this.scene.add.image(0, 0, this.imageKey);
+    this.setDepth(4);
     this.add(this.rocket);
 
     this.emitter.startFollow(this);
     this.body.setVelocity(this.velocity.x, this.velocity.y);
+    this.body.setBounce(1).setCollideWorldBounds(true);
+
     this.launchSound.play();
   }
 
@@ -46,7 +46,6 @@ export default class RocketContainers extends Phaser.GameObjects.Container {
     this.emitter.setSpeed({ min: 150, max: 200 });
     this.emitter.setQuantity(100);
     this.emitter.setQuantity(50);
-    // this.emitter.setEmitZone({ type: 'edge', source: this.explodeShape, quantity: 30 })
     this.emitter.explode();
     this.body.setVelocity(0, 0);
     this.visible = false;
@@ -55,20 +54,24 @@ export default class RocketContainers extends Phaser.GameObjects.Container {
     this.popSound.play();
   }
 
-  restart(x, y, imageKey, velocity) {
-    this.body.x = x;
-    this.body.y = y;
+  restart(x, y, imageKey, velocity) {   
+    this.setPosition(x, y);
     this.imageKey = imageKey;
     this.velocity = velocity;
 
     this.body.setVelocity(this.velocity.x, this.velocity.y);
+
+    this.emitter.manager.setTexture(imageKey);
+    this.rocket.setTexture(imageKey);
     this.emitter.setLifespan(500);
     this.emitter.setSpeed({min: 10, max: 15});
     this.emitter.setEmitZone({ type: 'edge', source: this.circle, quantity: 10 });
     this.emitter.setQuantity(8);
-    this.emitter.start();
+    this.emitter.flow(0);
+    this.emitter.startFollow(this);
+    this.emitter.visible = true;
     this.visible = true;
-    this.body.enable = true;
+    this.body.enable = true; 
     this.active = true;
     this.launchSound.play();
   }
