@@ -59,6 +59,10 @@ export default class RocketContainers extends Phaser.GameObjects.Container {
     this.imageKey = imageKey;
     this.velocity = velocity;
 
+    let imageData = this.scene.textures.get(imageKey).getSourceImage();
+    this.setSize(imageData.width, imageData.height);
+    this.body.setSize(imageData.width, imageData.height);
+
     this.body.setVelocity(this.velocity.x, this.velocity.y);
 
     this.emitter.manager.setTexture(imageKey);
