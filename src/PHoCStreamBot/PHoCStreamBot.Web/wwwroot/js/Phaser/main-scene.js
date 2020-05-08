@@ -21,14 +21,14 @@ export default class MainScene extends Phaser.Scene {
         this.load.image('test-emote', 'https://static-cdn.jtvnw.net/emoticons/v1/499/1.0');
         this.load.audio('firework-launch-01', '/sounds/firework-single-launch-01.wav');
         this.load.audio('firework-pop-01', '/sounds/firework-pop-01.wav');
+        this.load.multiatlas('aliens', '/Images/Sprites/aliens.json', '/Images/Sprites');
     }
 
     create() {
         PubSub.receive(messageTypes.hiPete, this.hiPete, this);
         PubSub.receive(messageTypes.yell, this.yell, this);
         PubSub.receive(messageTypes.popEmote, this.popEmote, this);
-
-
+        
         this.physics.world.setBounds(0, 0, 1920, 1080);
 
         this.text1 = this.add.text(400, 100, '', { fontSize: "35px" });
@@ -41,6 +41,30 @@ export default class MainScene extends Phaser.Scene {
         this.input.on('pointerdown', function (pointer) {
             this.launchRocket();
         }, this);
+
+        // var alien = this.add.sprite(0, 410, 'aliens', 'p1_walk01.png');
+        // alien.setOrigin(0,0);
+
+        // var frameNames = this.anims.generateFrameNames('aliens', {
+        //                      start: 1, end: 11, zeroPad: 2,
+        //                      prefix: 'p1_walk', suffix: '.png'
+        //                  });
+
+        // console.log(frameNames);
+        // this.anims.create({ key: 'walk', frames: frameNames, frameRate: 16, repeat: -1 });
+        // alien.anims.play('walk');
+
+        // this.tweens.add({
+        //     targets: alien,
+        //     x: 960,
+        //     duration: 5000,
+        //     //ease: 'Sine.easeInOut',
+        //     repeat: 0,
+        //     onComplete: function() {
+        //         alien.flipX = true;
+        //         alien.anims.stop();
+        //     }
+        // });
     }
 
     update() {
@@ -121,7 +145,9 @@ export default class MainScene extends Phaser.Scene {
     }
 
     createEmoteEffect(imageId) {
-        if(this.getRandomValue(0, 1) == 1) {
+        let selector = this.getRandomValue(0, 20);
+        console.log(`RandomEmotEffect value ${selector}`);
+        if(selector > 1) {
             setTimeout(() => {this.launchRocket(imageId);}, this.getRandomValue(1,500));
         } else {
             var particles = this.add.particles(imageId);
@@ -207,17 +233,17 @@ export default class MainScene extends Phaser.Scene {
         //     quantity: 8,
         //     gravityY: 200
         // },
-        {
-            blendMode: 'SCREEN',
-            lifespan: 500,
-            speed: { min: -100, max: 100 },
-            scale: { start: 1, end: 0 },
-            x: 1920 / 2,
-            y: 1080 / 2,
-            emitZone: { type: 'edge', source: new Phaser.Geom.Circle(0, 0, 200), quantity: 25 },
-            quantity: 8,
-            gravityY: 200
-        },
+        // {
+        //     blendMode: 'SCREEN',
+        //     lifespan: 500,
+        //     speed: { min: -100, max: 100 },
+        //     scale: { start: 1, end: 0 },
+        //     x: 1920 / 2,
+        //     y: 1080 / 2,
+        //     emitZone: { type: 'edge', source: new Phaser.Geom.Circle(0, 0, 200), quantity: 25 },
+        //     quantity: 8,
+        //     gravityY: 200
+        // },
     ];
 
     getRandomValue(min, max)
