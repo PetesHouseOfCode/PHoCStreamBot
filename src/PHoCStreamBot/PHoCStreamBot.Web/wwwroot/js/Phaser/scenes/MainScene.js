@@ -1,11 +1,11 @@
 ﻿"use strict";
-import messageTypes from "./message-types.js";
-import PubSub from "./PubSub.js";
-import RocketContainer from "./RocketContainer.js";
+import messageTypes from "../message-types.js";
+import PubSub from "../PubSub.js";
+import RocketContainer from "../RocketContainer.js";
 
 export default class MainScene extends Phaser.Scene {
     constructor() {
-        super();
+        super('Main');
         this.text1 = null;
         this.imagesLoaded = [];
         this.rockets = [];
@@ -14,14 +14,6 @@ export default class MainScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('blue', '/Images/Sprites/bluestar.png');
-        //this.load.spritesheet('smoke', '/Images/Sprites/Smoke15Frames.png', { frameWidth: 256, frameHeight: 256 });
-        this.load.image('pete-cyclops', '/Images/CyclopsPete-small.png');
-        this.load.image('pete-cyclops-fade', '/Images/CyclopsPete-small-fade.png');
-        this.load.image('test-emote', 'https://static-cdn.jtvnw.net/emoticons/v1/499/1.0');
-        this.load.audio('firework-launch-01', '/sounds/firework-single-launch-01.wav');
-        this.load.audio('firework-pop-01', '/sounds/firework-pop-01.wav');
-        this.load.multiatlas('aliens', '/Images/Sprites/aliens.json', '/Images/Sprites');
     }
 
     create() {
@@ -38,33 +30,58 @@ export default class MainScene extends Phaser.Scene {
         
         this.rockets2.push(new RocketContainer(this, 400, 1080, 'test-emote', 'firework-launch-01', 'firework-pop-01', { x: 100, y: -600 }));
 
-        this.input.on('pointerdown', function (pointer) {
-            this.launchRocket();
-        }, this);
+        // this.input.on('pointerdown', function (pointer) {
+        //     this.launchRocket();
+        // }, this);
 
-        // var alien = this.add.sprite(0, 410, 'aliens', 'p1_walk01.png');
-        // alien.setOrigin(0,0);
+        var alien = this.add.sprite(-100, 410, 'aliens', 'p1_walk01.png');
+        alien.setOrigin(0,0);
 
-        // var frameNames = this.anims.generateFrameNames('aliens', {
-        //                      start: 1, end: 11, zeroPad: 2,
-        //                      prefix: 'p1_walk', suffix: '.png'
-        //                  });
+        var frameNames = this.anims.generateFrameNames('aliens', {
+                             start: 1, end: 11, zeroPad: 2,
+                             prefix: 'p1_walk', suffix: '.png'
+                         });
 
-        // console.log(frameNames);
-        // this.anims.create({ key: 'walk', frames: frameNames, frameRate: 16, repeat: -1 });
-        // alien.anims.play('walk');
+        console.log(frameNames);
+        this.anims.create({ key: 'walk', frames: frameNames, frameRate: 16, repeat: -1 });
+        alien.anims.play('walk');
 
-        // this.tweens.add({
-        //     targets: alien,
-        //     x: 960,
-        //     duration: 5000,
-        //     //ease: 'Sine.easeInOut',
-        //     repeat: 0,
-        //     onComplete: function() {
-        //         alien.flipX = true;
-        //         alien.anims.stop();
-        //     }
-        // });
+        var timeline = this.tweens.timeline({
+            targets: alien,
+            tweens: [
+                {
+                    x: 850,
+                    duration: 4500,
+                    onComplete: () => {
+                        alien.anims.stop();
+                    }
+                },
+                {
+                    x: 960,
+                    y: 380,
+                    duration: 500,
+                    onStart: () => {
+                        alien.setTexture('aliens', 'p1_jump.png');
+                    },
+                    onComplete: () => {
+                        alien.setTexture('aliens', 'p1_front.png');
+                        alien.setPosition(960, 410);
+                    }
+                },
+                {
+                    x: -100,
+                    duration: 5000,
+                    onStart: () => {
+                        alien.flipX = true;
+                        alien.anims.play('walk');
+                    },
+                    onComplete: () => {
+                        alien.anims.stop();
+                        alien.visible = false;
+                    },
+                    offset: 8000
+                }]
+        });
     }
 
     update() {

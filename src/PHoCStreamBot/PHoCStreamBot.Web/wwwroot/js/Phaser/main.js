@@ -1,24 +1,22 @@
 "use strict";
+import config from "./config/Config.js";
 import messageTypes from "./message-types.js";
-import MainScene from "./main-scene.js";
+import BootScene from "./scenes/Boot.js";
+import PreloaderScene from "./scenes/PreloaderScene.js";
+import MainScene from "./scenes/MainScene.js";
 import PubSub from "./PubSub.js";
 
-var config = {
-    type: Phaser.AUTO,
-    width: 1920,
-    height: 1080,
-    physics: {
-        default: 'arcade',
-        arcade: {
-            debug: true,
-            gravity: { y: 200 }
-        }
-    },
-    scene: MainScene,
-    transparent: true
-};
+class Game extends Phaser.Game {
+    constructor(){
+        super(config);
+        this.scene.add('Boot', BootScene);
+        this.scene.add('Preloader', PreloaderScene);
+        this.scene.add('Main', MainScene);
+        this.scene.start('Boot');
+    }
+}
 
-var game = new Phaser.Game(config);
+window.game = new Game();
 
 var connection = new signalR.HubConnectionBuilder()
     .withUrl("/PHoCStreamBotHub")
