@@ -22,16 +22,22 @@ var connection = new signalR.HubConnectionBuilder()
     .withUrl("/PHoCStreamBotHub")
     .build();
 
-connection.on("ExecuteCommand", function (command, args) {
+connection.on("ExecuteCommand", function (command) {
     console.debug("Command executed: " + command);
+    console.debug(command);
 
-    if (command.toLowerCase() === "hi_pete") {
+    if (command.commandText.toLowerCase() === "hi_pete") {
         PubSub.dispatch(messageTypes.hiPete);
         return;
     }
 
-    if (command === "yell") {
-        PubSub.dispatch(messageTypes.yell, args);
+    if (command.commandText === "yell") {
+        PubSub.dispatch(messageTypes.yell, command.args.join(" "));
+        return;
+    }
+
+    if (command.commandText === "alien") {
+        PubSub.dispatch(messageTypes.alien, command);
         return;
     }
 });

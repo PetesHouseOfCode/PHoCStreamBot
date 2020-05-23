@@ -53,14 +53,14 @@ namespace PHoCStreamBot.Web.Controllers
                 return View();
             }
 
-            var command = new BotCommand(model.CommandName, SplitAndTrim(model.Args));
-            var def = commandDefs.FirstOrDefault(x => x.CommandText == command.CommandText);
-            if (def == null)
-            {
-                return BadRequest();
-            }
+            // var command = new BotCommand(model.CommandName, SplitAndTrim(model.Args));
+            // var def = commandDefs.FirstOrDefault(x => x.CommandText == command.CommandText);
+            // if (def == null)
+            // {
+            //     return BadRequest();
+            // }
 
-            def.Handler.Handle(command);
+            // def.Handler.Handle(command);
             return View(model);
         }
 

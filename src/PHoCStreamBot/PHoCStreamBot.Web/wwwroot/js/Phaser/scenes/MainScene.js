@@ -20,6 +20,7 @@ export default class MainScene extends Phaser.Scene {
         PubSub.receive(messageTypes.hiPete, this.hiPete, this);
         PubSub.receive(messageTypes.yell, this.yell, this);
         PubSub.receive(messageTypes.popEmote, this.popEmote, this);
+        PubSub.receive(messageTypes.alien, this.alienCommand, this);
         
         this.physics.world.setBounds(0, 0, 1920, 1080);
 
@@ -34,8 +35,8 @@ export default class MainScene extends Phaser.Scene {
         //     this.launchRocket();
         // }, this);
 
-        var alien = this.add.sprite(-100, 410, 'aliens', 'p1_walk01.png');
-        alien.setOrigin(0,0);
+        this.alien = this.add.sprite(-100, 410, 'aliens', 'p1_walk01.png');
+        this.alien.setOrigin(0,0);
 
         var frameNames = this.anims.generateFrameNames('aliens', {
                              start: 1, end: 11, zeroPad: 2,
@@ -43,45 +44,8 @@ export default class MainScene extends Phaser.Scene {
                          });
 
         console.log(frameNames);
+        
         this.anims.create({ key: 'walk', frames: frameNames, frameRate: 16, repeat: -1 });
-        alien.anims.play('walk');
-
-        var timeline = this.tweens.timeline({
-            targets: alien,
-            tweens: [
-                {
-                    x: 850,
-                    duration: 4500,
-                    onComplete: () => {
-                        alien.anims.stop();
-                    }
-                },
-                {
-                    x: 960,
-                    y: 380,
-                    duration: 500,
-                    onStart: () => {
-                        alien.setTexture('aliens', 'p1_jump.png');
-                    },
-                    onComplete: () => {
-                        alien.setTexture('aliens', 'p1_front.png');
-                        alien.setPosition(960, 410);
-                    }
-                },
-                {
-                    x: -100,
-                    duration: 5000,
-                    onStart: () => {
-                        alien.flipX = true;
-                        alien.anims.play('walk');
-                    },
-                    onComplete: () => {
-                        alien.anims.stop();
-                        alien.visible = false;
-                    },
-                    offset: 8000
-                }]
-        });
     }
 
     update() {
@@ -143,6 +107,49 @@ export default class MainScene extends Phaser.Scene {
         setTimeout(() => {
             this.text1.text = "";
         }, 3000);
+    }
+
+    alienCommand(messageType, args) {
+        this.alien.visible = true;
+        this.alien.flipX = false;
+        this.alien.anims.play('walk');
+
+        var timeline = this.tweens.timeline({
+            targets: this.alien,
+            tweens: [
+                {
+                    x: 850,
+                    duration: 4500,
+                    onComplete: () => {
+                        this.alien.anims.stop();
+                    }
+                },
+                {
+                    x: 960,
+                    y: 380,
+                    duration: 500,
+                    onStart: () => {
+                        this.alien.setTexture('aliens', 'p1_jump.png');
+                    },
+                    onComplete: () => {
+                        this.alien.setTexture('aliens', 'p1_front.png');
+                        this.alien.setPosition(960, 410);
+                    }
+                },
+                {
+                    x: -100,
+                    duration: 5000,
+                    onStart: () => {
+                        this.alien.flipX = true;
+                        this.alien.anims.play('walk');
+                    },
+                    onComplete: () => {
+                        this.alien.anims.stop();
+                        this.alien.visible = false;
+                    },
+                    offset: 8000
+                }]
+        });
     }
 
     popEmote(messageType, message) {
