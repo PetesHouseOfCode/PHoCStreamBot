@@ -1,7 +1,7 @@
 ﻿"use strict";
 import messageTypes from "../message-types.js";
-import PubSub from "../PubSub.js";
 import RocketContainer from "../RocketContainer.js";
+import AlienContainer from "../objects/AlienContainer.js";
 
 export default class MainScene extends Phaser.Scene {
     constructor() {
@@ -13,43 +13,83 @@ export default class MainScene extends Phaser.Scene {
         this.degree = 0.0174533;
     }
 
+    init() {
+        this.connection = this.sys.game.globals.connection;
+        this.pubSub = this.sys.game.globals.pubSub;
+
+        this.listenForMessages();
+    }
+
+    listenForMessages() {
+        const self = this;
+        this.connection.on("ExecuteCommand", function (command) {
+            console.debug("Command executed: " + command);
+            console.debug(command);
+        
+            if (command.commandText.toLowerCase() === "hi_pete") {
+                self.hiPete();
+                return;
+            }
+        
+            if (command.commandText === "yell") {
+                self.yell(command.args.join(" "));
+                return;
+            }
+        
+            if (command.commandText === "alien") {
+                self.alienCommand(command);
+                return;
+            }
+        });
+        
+        this.connection.on("ReceiveMessage", function(message){
+            console.debug("Signlr Received: ReceiveMessage");
+            console.debug(message);
+            
+            if(message.emotes.length > 0) {
+                for(let i = 0; i < message.emotes.length; i++) {
+                    let args = {
+                        id: message.emotes[i].name,
+                        url: message.emotes[i].imageUrl
+                    };
+        
+                    self.popEmote(args);
+                }
+            }
+        });
+    }
+
     preload() {
     }
 
     create() {
-        PubSub.receive(messageTypes.hiPete, this.hiPete, this);
-        PubSub.receive(messageTypes.yell, this.yell, this);
-        PubSub.receive(messageTypes.popEmote, this.popEmote, this);
-        PubSub.receive(messageTypes.alien, this.alienCommand, this);
-        
         this.physics.world.setBounds(0, 0, 1920, 1080);
 
         this.text1 = this.add.text(400, 100, '', { fontSize: "35px" });
         this.text1.setTint(0xff00ff, 0xffff00, 0x0000ff, 0xff0000);
 
         this.graphics = this.add.graphics();
-        
+
         this.rockets2.push(new RocketContainer(this, 400, 1080, 'test-emote', 'firework-launch-01', 'firework-pop-01', { x: 100, y: -600 }));
 
         // this.input.on('pointerdown', function (pointer) {
         //     this.launchRocket();
         // }, this);
 
-        this.alien = this.add.sprite(-100, 410, 'aliens', 'p1_walk01.png');
-        this.alien.setOrigin(0,0);
+        this.createAlienAnimations();
+    }
 
+    createAlienAnimations() {
         var frameNames = this.anims.generateFrameNames('aliens', {
-                             start: 1, end: 11, zeroPad: 2,
-                             prefix: 'p1_walk', suffix: '.png'
-                         });
-
-        console.log(frameNames);
-        
-        this.anims.create({ key: 'walk', frames: frameNames, frameRate: 16, repeat: -1 });
+            start: 1, end: 11, zeroPad: 2,
+            prefix: 'p1_walk', suffix: '.png'
+        });
+        this.anims.create({ key: 'alien_walk', frames: frameNames, frameRate: 16, repeat: -1 });
+        console.debug(frameNames);
     }
 
     update() {
-        this.rockets2.forEach((rocket) => { if(rocket.active) this.updateRocket2(rocket); });
+        this.rockets2.forEach((rocket) => { if (rocket.active) this.updateRocket2(rocket); });
     }
 
     updateRocket2(rocket) {
@@ -65,9 +105,8 @@ export default class MainScene extends Phaser.Scene {
         let velocityY = this.getRandomValue(-300, -650);
 
         let rocket = this.rockets2.filter((rocket) => !rocket.active);
-        if(rocket.length > 0)
-        {
-            rocket[0].restart(positionX, 1040, imageKey, {x: velocityX, y:velocityY});
+        if (rocket.length > 0) {
+            rocket[0].restart(positionX, 1040, imageKey, { x: velocityX, y: velocityY });
             console.log('restarting existing rocket');
             return;
         }
@@ -75,7 +114,7 @@ export default class MainScene extends Phaser.Scene {
         this.rockets2.push(new RocketContainer(this, positionX, 1040, imageKey, 'firework-launch-01', 'firework-pop-01', { x: velocityX, y: velocityY }))
     }
 
-    hiPete(messageType) {
+    hiPete() {
         const circle = new Phaser.Geom.Circle(1920 / 2, 1080 / 2, 150);
         this.graphics.strokeCircleShape(circle);
         const particles = this.add.particles('pete-cyclops-fade');
@@ -102,57 +141,19 @@ export default class MainScene extends Phaser.Scene {
         }, 5000);
     }
 
-    yell(messageType, text) {
+    yell( text) {
         this.text1.text = text;
         setTimeout(() => {
             this.text1.text = "";
         }, 3000);
     }
 
-    alienCommand(messageType, args) {
-        this.alien.visible = true;
-        this.alien.flipX = false;
-        this.alien.anims.play('walk');
-
-        var timeline = this.tweens.timeline({
-            targets: this.alien,
-            tweens: [
-                {
-                    x: 850,
-                    duration: 4500,
-                    onComplete: () => {
-                        this.alien.anims.stop();
-                    }
-                },
-                {
-                    x: 960,
-                    y: 380,
-                    duration: 500,
-                    onStart: () => {
-                        this.alien.setTexture('aliens', 'p1_jump.png');
-                    },
-                    onComplete: () => {
-                        this.alien.setTexture('aliens', 'p1_front.png');
-                        this.alien.setPosition(960, 410);
-                    }
-                },
-                {
-                    x: -100,
-                    duration: 5000,
-                    onStart: () => {
-                        this.alien.flipX = true;
-                        this.alien.anims.play('walk');
-                    },
-                    onComplete: () => {
-                        this.alien.anims.stop();
-                        this.alien.visible = false;
-                    },
-                    offset: 8000
-                }]
-        });
+    alienCommand(args) {
+        this.alien = new AlienContainer(this, 100, 410, "aliens", "p1_front.png", "p1_jump.png", "alien_walk", args.user.username, args.user.hexColor);
+        this.alien.walkOn();
     }
 
-    popEmote(messageType, message) {
+    popEmote(message) {
         this.load.on('filecomplete-image-' + message.id, (file) => {
             console.log('loaded image: ' + file);
             this.imagesLoaded.push(file);
@@ -171,8 +172,8 @@ export default class MainScene extends Phaser.Scene {
     createEmoteEffect(imageId) {
         let selector = this.getRandomValue(0, 20);
         console.log(`RandomEmotEffect value ${selector}`);
-        if(selector > 1) {
-            setTimeout(() => {this.launchRocket(imageId);}, this.getRandomValue(1,500));
+        if (selector > 1) {
+            setTimeout(() => { this.launchRocket(imageId); }, this.getRandomValue(1, 500));
         } else {
             var particles = this.add.particles(imageId);
             var emitterIndex = Math.floor(Math.random() * this.emitterPositions.length);
@@ -193,13 +194,13 @@ export default class MainScene extends Phaser.Scene {
                 rotate: { min: -30, max: 30 },
                 quantity: emitConfig.quantity
             }, this);
-    
+
             var timeout = Math.floor(2000 + (Math.random() * 3000))
             setTimeout(() => {
                 emitter2.stop();
                 this.load.off('filecomplete-image-' + imageId);
             }, timeout);
-        }        
+        }
     }
 
     emitterPositions = [
@@ -270,8 +271,7 @@ export default class MainScene extends Phaser.Scene {
         // },
     ];
 
-    getRandomValue(min, max)
-    {
+    getRandomValue(min, max) {
         return Math.floor(min + (Math.random() * (max - min)))
     }
 }
