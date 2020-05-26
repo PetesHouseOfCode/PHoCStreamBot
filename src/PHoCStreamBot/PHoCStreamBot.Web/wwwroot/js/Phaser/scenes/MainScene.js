@@ -11,9 +11,13 @@ export default class MainScene extends Phaser.Scene {
         this.rockets = [];
         this.rockets2 = [];
         this.degree = 0.0174533;
+
+        
+        this.hsv = Phaser.Display.Color.HSVColorWheel();
     }
 
     init() {
+        
         this.connection = this.sys.game.globals.connection;
         this.pubSub = this.sys.game.globals.pubSub;
 
@@ -63,6 +67,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     create() {
+        
         this.physics.world.setBounds(0, 0, 1920, 1080);
 
         this.text1 = this.add.text(400, 100, '', { fontSize: "35px" });
@@ -75,6 +80,14 @@ export default class MainScene extends Phaser.Scene {
         // this.input.on('pointerdown', function (pointer) {
         //     this.launchRocket();
         // }, this);
+
+        this.input.on('pointerdown', function(pointer) {
+            this.alienCommand({commandText: 'na',
+                user: {
+                    username: 'button test',
+
+                }});
+        }, this);
 
         this.createAlienAnimations();
     }
@@ -149,7 +162,19 @@ export default class MainScene extends Phaser.Scene {
     }
 
     alienCommand(args) {
-        this.alien = new AlienContainer(this, 100, 410, "aliens", "p1_front.png", "p1_jump.png", "alien_walk", args.user.username, args.user.hexColor);
+        const newTint = Phaser.Math.Between(0, 359);
+        const y = Phaser.Math.Between(50, 1000);
+        const x = Phaser.Math.Between(0, 1) ? -100 : 2020;
+        this.alien = new AlienContainer(
+            this,
+            x, y,
+            "aliens",
+            "p1_front.png",
+            "p1_jump.png",
+            "alien_walk",
+            args.user.username,
+            args.user.hexColor,
+            this.hsv[newTint].color);
         this.alien.walkOn();
     }
 

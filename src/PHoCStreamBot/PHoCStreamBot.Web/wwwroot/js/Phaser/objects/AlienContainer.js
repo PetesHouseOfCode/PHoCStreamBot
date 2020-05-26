@@ -6,7 +6,7 @@ const Direction = {
 };
 
 export default class AlienContainer extends Phaser.GameObjects.Container {
-  constructor(scene, x, y, key, standFrame, jumpFrame, walkAnim, name, nameColor) {
+  constructor(scene, x, y, key, standFrame, jumpFrame, walkAnim, name, nameColor, tint) {
     super(scene, x, y);
     this.scene = scene; // the scene this container will be added to
     // this.velocity = 160; // the velocity when moving our player
@@ -19,6 +19,8 @@ export default class AlienContainer extends Phaser.GameObjects.Container {
     this.walkAnim = walkAnim;
     this.name = name;
     this.nameColor = nameColor || 'white';
+    this.tint = tint;
+    this.yLine = y;
 
     // set a size on the container
     this.setSize(64, 64);
@@ -31,6 +33,7 @@ export default class AlienContainer extends Phaser.GameObjects.Container {
     this.scene.add.existing(this);
     this.alien = this.scene.add.sprite(0, 0, this.alienKey, this.standFrame);
     this.alien.setOrigin(0, 0);
+    this.alien.setTint(tint);
     this.add(this.alien);
 
     // create the alien name
@@ -70,45 +73,87 @@ export default class AlienContainer extends Phaser.GameObjects.Container {
 
   walkOn() {
     this.visible = true;
-    this.alien.flipX = false;
     this.alien.anims.play(this.walkAnim);
+    const stopPosition = Phaser.Math.Between(800, 1120);
 
-    var timeline = this.scene.tweens.timeline({
-      targets: this,
-      tweens: [
-        {
-          x: 850,
-          duration: 4500,
-          onComplete: () => {
-            this.alien.anims.stop();
-          }
-        },
-        {
-          x: 960,
-          y: 380,
-          duration: 500,
-          onStart: () => {
-            this.alien.setTexture(this.alienKey, this.jumpFrame);
+    if(this.x < 960) {
+      this.alien.flipX = false;
+      var timeline = this.scene.tweens.timeline({
+        targets: this,
+        tweens: [
+          {
+            x: stopPosition - 110,
+            duration: 4500,
+            onComplete: () => {
+              this.alien.anims.stop();
+            }
           },
-          onComplete: () => {
-            this.alien.setTexture(this.alienKey, this.standFrame);
-            this.setPosition(960, 410);
-          }
-        },
-        {
-          x: -100,
-          duration: 5000,
-          onStart: () => {
-            this.alien.flipX = true;
-            this.alien.anims.play(this.walkAnim);
+          {
+            x: stopPosition,
+            y: this.yLine - 30,
+            duration: 500,
+            onStart: () => {
+              this.alien.setTexture(this.alienKey, this.jumpFrame);
+            },
+            onComplete: () => {
+              this.alien.setTexture(this.alienKey, this.standFrame);
+              this.setPosition(stopPosition, this.yLine);
+            }
           },
-          onComplete: () => {
-            this.alien.anims.stop();
-            this.visible = false;
+          {
+            x: -100,
+            duration: 5000,
+            onStart: () => {
+              this.alien.flipX = true;
+              this.alien.anims.play(this.walkAnim);
+            },
+            onComplete: () => {
+              this.alien.anims.stop();
+              this.visible = false;
+            },
+            offset: 8000
+          }]
+      });
+    }
+    else {
+      this.alien.flipX = true;
+      var timeline = this.scene.tweens.timeline({
+        targets: this,
+        tweens: [
+          {
+            x: stopPosition + 110,
+            duration: 4500,
+            onComplete: () => {
+              this.alien.anims.stop();
+            }
           },
-          offset: 8000
-        }]
-    });
+          {
+            x: stopPosition,
+            y: this.yLine - 30,
+            duration: 500,
+            onStart: () => {
+              this.alien.setTexture(this.alienKey, this.jumpFrame);
+            },
+            onComplete: () => {
+              this.alien.setTexture(this.alienKey, this.standFrame);
+              this.setPosition(stopPosition, this.yLine);
+            }
+          },
+          {
+            x: 2020,
+            duration: 5000,
+            onStart: () => {
+              this.alien.flipX = false;
+              this.alien.anims.play(this.walkAnim);
+            },
+            onComplete: () => {
+              this.alien.anims.stop();
+              this.visible = false;
+            },
+            offset: 8000
+          }]
+      });
+    }
   }
 
   update(cursors) {
