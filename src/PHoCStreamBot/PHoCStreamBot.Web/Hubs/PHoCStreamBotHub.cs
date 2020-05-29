@@ -11,7 +11,7 @@ namespace PHoCStreamBot.Web.Hubs
     {
         public void SendCommand(string command, string args)
         {
-            Clients.All.ExecuteCommand(command, args);
+            // Clients.All.ExecuteCommand(command, args);
         }
 
         public PHoCStreamBotHub()
@@ -21,7 +21,7 @@ namespace PHoCStreamBot.Web.Hubs
 
     public interface IPHoCStreamBotHub
     {
-        Task ExecuteCommand(string command, string args);
+        Task ExecuteCommand(BotCommand command);
         Task ReceiveMessage(ChatMessage message);
     }
 
