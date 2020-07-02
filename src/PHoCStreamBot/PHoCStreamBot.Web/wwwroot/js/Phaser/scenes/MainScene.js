@@ -11,6 +11,7 @@ export default class MainScene extends Phaser.Scene {
         this.rockets = [];
         this.rockets2 = [];
         this.degree = 0.0174533;
+        this.aliens = [];
 
         this.hsv = Phaser.Display.Color.HSVColorWheel();
     }
@@ -85,14 +86,19 @@ export default class MainScene extends Phaser.Scene {
                     hexcolor: ''
                 }
             });
-            }, this);
+        }, this);
 
+        this.buildAlienWalkAnim('p1_walk', 'p1_alien_walk');
+        this.buildAlienWalkAnim('p2_walk', 'p2_alien_walk');
+        this.buildAlienWalkAnim('p3_walk', 'p3_alien_walk');
+    }
+
+    buildAlienWalkAnim(framePrefix, animKeyName) {
         var frameNames = this.anims.generateFrameNames('aliens', {
             start: 1, end: 11, zeroPad: 2,
-            prefix: 'p1_walk', suffix: '.png'
+            prefix: framePrefix, suffix: '.png'
         });
-
-        this.anims.create({ key: 'alien_walk', frames: frameNames, frameRate: 16, repeat: -1 });
+        this.anims.create({ key: animKeyName, frames: frameNames, frameRate: 16, repeat: -1 });
     }
 
     update() {
@@ -155,57 +161,199 @@ export default class MainScene extends Phaser.Scene {
         }, 3000);
     }
 
-    alienCommand(args) {
+    alienCommand(command) {
+        const self = this;
+        if (command.args && command.args.filter(x => x === "invade").length > 0) {
+            for (var i = 0; i < 70; i++) {
+                setTimeout(() => {
+                    self.SetupAlien(command.user.username, command.user.hexColor);
+                },
+                    Phaser.Math.Between(0, 8000));
+            }
+
+            return;
+        }
+
+        const userAliens = this.aliens.filter(x => x.username === command.user.username);
+        if (userAliens.length <= 0) {
+            const tintColorIndex = Phaser.Math.Between(0, 359);
+            const y = Phaser.Math.Between(30, 1020);
+            const x = Phaser.Math.Between(50, 10);//1870);
+
+
+            const alienId = Phaser.Math.Between(1, 3);
+            const standFrame = `p${alienId}_front.png`;
+            const jumpFrame = `p${alienId}_jump.png`;
+            const walkAnim = `p${alienId}_alien_walk`;
+
+            this.aliens.push({
+                username: command.user.username,
+                sprite: new AlienContainer(
+                    this,
+                    x, y,
+                    'aliens',
+                    standFrame,
+                    jumpFrame,
+                    walkAnim,
+                    command.user.username,
+                    command.user.hexColor || 'white',
+                    this.hsv[tintColorIndex].color,
+                    true)
+            });
+        } else {
+            const userAlien = userAliens[0];
+            let velocityX = 0;
+            let velocityY = 0;
+
+            if (command.args.filter(x => x.indexOf("r") >= 0).length > 0) {
+                const factor = parseInt(command.args.filter(x => x.indexOf("r") >= 0)[0].replace("r", ""));
+                velocityX = 50 * factor;
+            }
+
+            if (command.args.filter(x => x.indexOf("l") >= 0).length > 0) {
+                const factor = parseInt(command.args.filter(x => x.indexOf("l") >= 0)[0].replace("l", ""));
+                velocityX = -50 * factor;
+            }
+
+            if (command.args.filter(x => x.indexOf("u") >= 0).length > 0) {
+                const factor = parseInt(command.args.filter(x => x.indexOf("u") >= 0)[0].replace("u", ""));
+                velocityY = -50 * factor;
+            }
+
+            if (command.args.filter(x => x.indexOf("d") >= 0).length > 0) {
+                const factor = parseInt(command.args.filter(x => x.indexOf("d") >= 0)[0].replace("d", ""));
+                velocityY = 50 * factor;
+            }
+
+
+            if (velocityX !== 0 || velocityY !== 0) {
+                userAlien.sprite.body.setVelocity(velocityX, velocityY);
+            }
+            
+            userAlien.sprite.jump();
+            setTimeout(() => userAlien.sprite.stand(), 3000);
+        }
+    }
+
+    SetupAlien(username, hexColor) {
         const tintColorIndex = Phaser.Math.Between(0, 359);
         const y = Phaser.Math.Between(30, 1020);
-        const alien = new AlienContainer(
-            this,
-            -70, y,
-            'aliens',
-            'p1_front.png',
-            'p1_jump.png',
-            'alien_walk',
-            args.user.username,
-            args.user.hexColor || 'white',
-            this.hsv[tintColorIndex].color);
+        const x = Phaser.Math.Between(150, 1770);
 
-        alien.walkRight();
+        const rightLeft = Phaser.Math.Between(0, 1);
+        const keepGoing = Phaser.Math.Between(0, 1);
 
-        var timeline = this.tweens.timeline({
-            targets: alien,
-            tweens: [
-                {
-                    x: 850,
-                    duration: 4500,
-                    onComplete: () => {
-                        alien.stopWalking();
+        const alienId = Phaser.Math.Between(1, 3);
+        const standFrame = `p${alienId}_front.png`;
+        const jumpFrame = `p${alienId}_jump.png`;
+        const walkAnim = `p${alienId}_alien_walk`;
+
+        if (rightLeft === 0) {
+            const alien = new AlienContainer(
+                this,
+                -70, y,
+                'aliens',
+                standFrame,
+                jumpFrame,
+                walkAnim,
+                username,
+                hexColor || 'white',
+                this.hsv[tintColorIndex].color);
+            alien.walkRight();
+            var timeline = this.tweens.timeline({
+                targets: alien,
+                tweens: [
+                    {
+                        x: x - 110,
+                        duration: 4500,
+                        onComplete: () => {
+                            alien.stopWalking();
+                        }
+                    },
+                    {
+                        x: x,
+                        y: y - 30,
+                        duration: 500,
+                        onStart: () => {
+                            alien.jump();
+                        },
+                        onComplete: () => {
+                            alien.stand();
+                            alien.setPosition(x, y);
+                        }
+                    },
+                    {
+                        x: keepGoing ? 1990 : -100,
+                        duration: 5000,
+                        onStart: () => {
+                            if (keepGoing) {
+                                alien.walkRight();
+                            } else {
+                                alien.walkLeft();
+                            }
+                        },
+                        onComplete: () => {
+                            alien.stopWalking();
+                            alien.visible = false;
+                        },
+                        offset: 8000
                     }
-                },
-                {
-                    x: 960,
-                    y: y - 30,
-                    duration: 500,
-                    onStart: () => {
-                        alien.jump();
+                ]
+            });
+        }
+        else {
+            const alien = new AlienContainer(
+                this,
+                1990, y,
+                'aliens',
+                standFrame,
+                jumpFrame,
+                walkAnim,
+                username,
+                hexColor || 'white',
+                this.hsv[tintColorIndex].color);
+            alien.walkLeft();
+            var timeline = this.tweens.timeline({
+                targets: alien,
+                tweens: [
+                    {
+                        x: x + 110,
+                        duration: 4500,
+                        onComplete: () => {
+                            alien.stopWalking();
+                        }
                     },
-                    onComplete: () => {
-                        alien.stand();
-                        alien.setPosition(960, y);
+                    {
+                        x: x,
+                        y: y - 30,
+                        duration: 500,
+                        onStart: () => {
+                            alien.jump();
+                        },
+                        onComplete: () => {
+                            alien.stand();
+                            alien.setPosition(x, y);
+                        }
+                    },
+                    {
+                        x: keepGoing ? -100 : 1990,
+                        duration: 5000,
+                        onStart: () => {
+                            if (keepGoing) {
+                                alien.walkLeft();
+                            } else {
+                                alien.walkRight();
+                            }
+                        },
+                        onComplete: () => {
+                            alien.stopWalking();
+                            alien.visible = false;
+                        },
+                        offset: 8000
                     }
-                },
-                {
-                    x: -100,
-                    duration: 5000,
-                    onStart: () => {
-                        alien.walkLeft();
-                    },
-                    onComplete: () => {
-                        alien.stopWalking();
-                        alien.visible = false;
-                    },
-                    offset: 8000
-                }]
-        });
+                ]
+            });
+        }
     }
 
     popEmote(message) {

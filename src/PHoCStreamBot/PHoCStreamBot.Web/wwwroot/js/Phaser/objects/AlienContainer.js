@@ -1,5 +1,5 @@
 export default class AlienContainer extends Phaser.GameObjects.Container {
-    constructor(scene, x, y, key, standFrame, jumpFrame, walkAnim, name, nameColor, alienColor) {
+    constructor(scene, x, y, key, standFrame, jumpFrame, walkAnim, name, nameColor, alienColor, doesCollide) {
         super(scene, x, y);
         this.scene = scene;
 
@@ -11,11 +11,19 @@ export default class AlienContainer extends Phaser.GameObjects.Container {
         this.nameColor = nameColor;
         this.alienColor = alienColor;
 
+        this.scene.physics.world.enable(this);
         this.scene.add.existing(this);
         this.alien = this.scene.add.sprite(0, 0, key, standFrame);
+
+        if (doesCollide) {
+            this.body.setCollideWorldBounds(true);
+        }
+
+        this.body.setAllowGravity(false);
+        this.body.setDrag(50);
         this.alien.setOrigin(0, 0);
         this.alien.setTint(alienColor);
-        
+
         this.add(this.alien);
         this.createNamePlate();
     }
