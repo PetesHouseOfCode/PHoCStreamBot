@@ -9,6 +9,18 @@ import PubSub from "./PubSub.js";
 class Game extends Phaser.Game {
     constructor(){
         super(config);
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/PHoCStreamBotHub")
+            .build();
+        connection
+            .start()
+            .catch(function(err) {
+                return console.error(err.toString());
+            });
+        this.globals = {
+            connection: connection,
+            pubSub: PubSub
+        };
         this.scene.add('Boot', BootScene);
         this.scene.add('Preloader', PreloaderScene);
         this.scene.add('Main', MainScene);
@@ -17,49 +29,3 @@ class Game extends Phaser.Game {
 }
 
 window.game = new Game();
-
-var connection = new signalR.HubConnectionBuilder()
-    .withUrl("/PHoCStreamBotHub")
-    .build();
-
-connection.on("ExecuteCommand", function (command) {
-    console.debug("Command executed: " + command);
-    console.debug(command);
-
-    if (command.commandText.toLowerCase() === "hi_pete") {
-        PubSub.dispatch(messageTypes.hiPete);
-        return;
-    }
-
-    if (command.commandText === "yell") {
-        PubSub.dispatch(messageTypes.yell, command.args.join(" "));
-        return;
-    }
-
-    if (command.commandText === "alien") {
-        PubSub.dispatch(messageTypes.alien, command);
-        return;
-    }
-});
-
-connection.on("ReceiveMessage", function(message){
-    console.debug("Signlr Received: ReceiveMessage");
-    console.debug(message);
-    
-    if(message.emotes.length > 0) {
-        for(let i = 0; i < message.emotes.length; i++) {
-            let args = {
-                id: message.emotes[i].name,
-                url: message.emotes[i].imageUrl
-            };
-
-            PubSub.dispatch(messageTypes.popEmote, args);
-        }
-    }
-});
-
-connection
-    .start()
-    .catch(function(err) {
-        return console.error(err.toString());
-    });
