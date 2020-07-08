@@ -11,17 +11,22 @@ export default class AlienContainer extends Phaser.GameObjects.Container {
         this.nameColor = nameColor;
         this.alienColor = alienColor;
 
+        // Getting the sprite size to set for container
+        // let imageData = this.scene.textures.get(key).getSourceImage();
+        let frameInfo = this.scene.textures.get(key).frames[standFrame];
+        this.setSize(frameInfo.cutWidth, frameInfo.cutHeight);
+
         this.scene.physics.world.enable(this);
         this.scene.add.existing(this);
         this.alien = this.scene.add.sprite(0, 0, key, standFrame);
 
         if (doesCollide) {
             this.body.setCollideWorldBounds(true);
+            this.body.setBounce(.7);
         }
 
         this.body.setAllowGravity(false);
         this.body.setDrag(50);
-        this.alien.setOrigin(0, 0);
         this.alien.setTint(alienColor);
 
         this.add(this.alien);
@@ -29,7 +34,8 @@ export default class AlienContainer extends Phaser.GameObjects.Container {
     }
 
     createNamePlate() {
-        this.namePlate = this.scene.add.text(-30, -18, this.name, { fontSize: '16px', color: this.nameColor });
+        this.namePlate = this.scene.add.text(-38, -65, this.name, { fontSize: '16px', color: this.nameColor });
+        this.namePlate.setX((this.namePlate.width / 2) * -1);
         this.add(this.namePlate);
     }
 

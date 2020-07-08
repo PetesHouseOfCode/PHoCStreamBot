@@ -91,6 +91,8 @@ export default class MainScene extends Phaser.Scene {
         this.buildAlienWalkAnim('p1_walk', 'p1_alien_walk');
         this.buildAlienWalkAnim('p2_walk', 'p2_alien_walk');
         this.buildAlienWalkAnim('p3_walk', 'p3_alien_walk');
+        
+        console.log(this.textures.get("aliens").frames);
     }
 
     buildAlienWalkAnim(framePrefix, animKeyName) {
@@ -178,7 +180,7 @@ export default class MainScene extends Phaser.Scene {
         if (userAliens.length <= 0) {
             const tintColorIndex = Phaser.Math.Between(0, 359);
             const y = Phaser.Math.Between(30, 1020);
-            const x = Phaser.Math.Between(50, 10);//1870);
+            const x = Phaser.Math.Between(50, 400); //1870);
 
 
             const alienId = Phaser.Math.Between(1, 3);
