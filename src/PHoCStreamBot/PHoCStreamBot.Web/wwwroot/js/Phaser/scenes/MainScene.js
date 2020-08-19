@@ -91,6 +91,9 @@ export default class MainScene extends Phaser.Scene {
         this.buildAlienWalkAnim('p1_walk', 'p1_alien_walk');
         this.buildAlienWalkAnim('p2_walk', 'p2_alien_walk');
         this.buildAlienWalkAnim('p3_walk', 'p3_alien_walk');
+        
+        this.aliensGroup = this.physics.add.group({allowGravity:false});
+        this.physics.add.collider(this.aliensGroup, this.aliensGroup);     
     }
 
     buildAlienWalkAnim(framePrefix, animKeyName) {
@@ -178,7 +181,7 @@ export default class MainScene extends Phaser.Scene {
         if (userAliens.length <= 0) {
             const tintColorIndex = Phaser.Math.Between(0, 359);
             const y = Phaser.Math.Between(30, 1020);
-            const x = Phaser.Math.Between(50, 10);//1870);
+            const x = Phaser.Math.Between(50, 400); //1870);
 
 
             const alienId = Phaser.Math.Between(1, 3);
@@ -186,19 +189,22 @@ export default class MainScene extends Phaser.Scene {
             const jumpFrame = `p${alienId}_jump.png`;
             const walkAnim = `p${alienId}_alien_walk`;
 
+            const alienSprite = new AlienContainer(
+                this,
+                x, y,
+                'aliens',
+                standFrame,
+                jumpFrame,
+                walkAnim,
+                command.user.username,
+                command.user.hexColor || 'white',
+                this.hsv[tintColorIndex].color,
+                true,                
+                this.aliensGroup);
+            
             this.aliens.push({
                 username: command.user.username,
-                sprite: new AlienContainer(
-                    this,
-                    x, y,
-                    'aliens',
-                    standFrame,
-                    jumpFrame,
-                    walkAnim,
-                    command.user.username,
-                    command.user.hexColor || 'white',
-                    this.hsv[tintColorIndex].color,
-                    true)
+                sprite: alienSprite
             });
         } else {
             const userAlien = userAliens[0];
